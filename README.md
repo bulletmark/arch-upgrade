@@ -1,4 +1,4 @@
-## ARCH LINUX UPGRADER
+### ARCH LINUX UPGRADER
 
 Arch-upgrade is small desktop convenience app which can be placed in
 your [Arch Linux](http://www.archlinux.org) launcher/dock. Click on it
@@ -13,8 +13,9 @@ updates on the Arch news feed.
     cd arch-upgrade
     make install     # can also do this as root to install globally
 
-Then install yaourt from the AUR. Or use another package manager and set
-ARCH_UPGRADE in your environment.
+Then install [Yaourt](http://wiki.archlinux.org/index.php/yaourt) from
+the AUR. Or use another package manager and set ARCH_UPGRADE in your
+environment.
 
 ### REMOVAL
 
