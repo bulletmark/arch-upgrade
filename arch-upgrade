@@ -1,0 +1,94 @@
+#!/bin/bash
+# Run an upgrade of an arch linux system in a terminal window.
+# M.Blakeney.
+
+# Terminal app we want to use. Arch doesn't use /etc/alternatives :(
+#XTERMINAL="x-terminal-emulator"
+XTERMINAL="gnome-terminal"
+
+# Number of lines of recent arch news we want to see
+NUMNEWS=10
+NEWSURL="https://www.archlinux.org/news/"
+
+PROG=$(basename $0)
+LAST=$HOME/.$PROG
+
+usage() {
+    echo "Usage: $PROG"
+    echo "Options:"
+    echo "-t (do not start and run a new $XTERMINAL)"
+    exit 1
+}
+
+# Process command line options
+INTERM=1
+while getopts t c; do
+    case $c in
+    t) INTERM=0;;
+    ?) usage;;
+    esac
+done
+
+shift $((OPTIND - 1))
+
+if [ $# -ne 0 ]; then
+    usage
+fi
+
+# Spawn off a terminal window to run ourself again
+if [[ $INTERM -ne 0 ]]; then
+    exec $XTERMINAL -e "$0 -t"
+fi
+
+tmp=$(mktemp)
+trap "rm -f $tmp; exit" 0 1 2 3 15
+
+echo "##### Arch software upgrade starting #####"
+echo
+echo "Fetching latest Arch news .."
+
+# Grab latest news and report any new news items
+curl -silent "$NEWSURL" | html2text -nobs -ascii |
+    grep '^20[0-9][0-9]-' | head -$NUMNEWS >$tmp
+
+if [[ -f $LAST ]]; then
+    diffs=$(comm -23 <(sort $tmp) <(sort $LAST) | sort -rn)
+else
+    diffs=$(cat $tmp)
+fi
+
+if [[ -n $diffs ]]; then
+    mv $tmp $LAST
+    # If new news then stop and prompt
+    echo
+    echo "*** WARNING - ARCH NEWS UPDATE ***:"
+    echo "$diffs"
+    echo
+    echo "Continue Arch software upgrade?"
+    if ! zenity --icon-name arch-upgrade --title "" --question \
+	--text "Continue Arch software upgrade?"; then
+        exit 0
+    fi
+else
+    echo
+    echo "No Arch news updates."
+fi
+
+echo
+echo "Performing Arch software update and upgrade .."
+
+# Can redefine following env variable to use different package manager
+echo
+echo ${ARCH_UPGRADE:="yaourt -Syua --noconfirm"}
+
+if $ARCH_UPGRADE; then
+    msg="Arch software upgrade finished."
+    echo
+    echo "##### $msg #####"
+    zenity --icon-name arch-upgrade --title "" --info --text "$msg"
+else
+    msg="Arch software upgrade finished with ERROR."
+    echo
+    echo "##### $msg #####"
+    zenity --title "" --error --text "$msg"
+fi
