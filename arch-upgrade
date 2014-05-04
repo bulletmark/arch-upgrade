@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run an upgrade of an arch linux system in a terminal window.
+# Run an upgrade of an arch linux system in a new terminal window.
 # M.Blakeney.
 
 # Terminal app we want to use. Arch doesn't use /etc/alternatives :(
@@ -16,15 +16,18 @@ LAST=$HOME/.$PROG
 usage() {
     echo "Usage: $PROG"
     echo "Options:"
-    echo "-t (do not start and run a new $XTERMINAL)"
+    echo "-s (run as slave, i.e. do not start and run in a new $XTERMINAL)"
+    echo "-c (run directly in command line, with no GUI prompts)"
     exit 1
 }
 
 # Process command line options
-INTERM=1
-while getopts t c; do
+SLAVE=0
+CMDLINE=0
+while getopts sc c; do
     case $c in
-    t) INTERM=0;;
+    s) SLAVE=1;;
+    c) SLAVE=1;CMDLINE=1;;
     ?) usage;;
     esac
 done
@@ -35,9 +38,41 @@ if [ $# -ne 0 ]; then
     usage
 fi
 
+# Function to read yes/no response
+ask() {
+    # Arg 1 is question prompt to user
+    # Arg 2 is optional "Y" or "N" default
+    while true; do
+        if [ "$2" = "Y" ]; then
+            prompt="Y/n"
+            default="Y"
+        elif [ "$2" = "N" ]; then
+            prompt="y/N"
+            default="N"
+        else
+            prompt="y/n"
+            default=""
+        fi
+
+        # Ask the question
+        read -p "$1 [$prompt] " REPLY
+
+        # Default?
+        if [ -z "$REPLY" ]; then
+            REPLY=$default
+        fi
+
+        # Check if the reply is valid
+        case "$REPLY" in
+            Y*|y*) return 0;;
+            N*|n*) return 1;;
+        esac
+    done
+}
+
 # Spawn off a terminal window to run ourself again
-if [[ $INTERM -ne 0 ]]; then
-    exec $XTERMINAL -e "$0 -t"
+if [[ $SLAVE -eq 0 ]]; then
+    exec $XTERMINAL -e "$0 -s"
 fi
 
 tmp=$(mktemp)
@@ -64,10 +99,17 @@ if [[ -n $diffs ]]; then
     echo "*** WARNING - ARCH NEWS UPDATE ***:"
     echo "$diffs"
     echo
-    echo "Continue Arch software upgrade?"
-    if ! zenity --icon-name arch-upgrade --title "" --question \
-	--text "Continue Arch software upgrade?"; then
-        exit 0
+    msg="Continue Arch software upgrade?"
+    if [ $CMDLINE -eq 0 ]; then
+	echo $PROMPT
+	if ! zenity --icon-name arch-upgrade --title "" --question \
+	    --text "$msg"; then
+	    exit 0
+	fi
+    else
+	if ! ask "$msg" N; then
+	    exit 0
+	fi
     fi
 else
     echo
@@ -81,14 +123,20 @@ echo "Performing Arch software update and upgrade .."
 echo
 echo ${ARCH_UPGRADE:="yaourt -Syua --noconfirm"}
 
-if $ARCH_UPGRADE; then
-    msg="Arch software upgrade finished."
-    echo
-    echo "##### $msg #####"
-    zenity --icon-name arch-upgrade --title "" --info --text "$msg"
-else
+if ! $ARCH_UPGRADE; then
     msg="Arch software upgrade finished with ERROR."
     echo
     echo "##### $msg #####"
-    zenity --title "" --error --text "$msg"
+    if [ $CMDLINE -eq 0 ]; then
+	zenity --title "" --error --text "$msg"
+    fi
+    exit 1
 fi
+
+msg="Arch software upgrade finished."
+echo
+echo "##### $msg #####"
+if [ $CMDLINE -eq 0 ]; then
+    zenity --icon-name arch-upgrade --title "" --info --text "$msg"
+fi
+exit 0
