@@ -13,6 +13,8 @@ NEWSURL="https://www.archlinux.org/news/"
 PROG=$(basename $0)
 LAST=$HOME/.$PROG
 
+CLS="--class ArchUpgrade"
+
 usage() {
     echo "Usage: $PROG"
     echo "Options:"
@@ -72,7 +74,7 @@ ask() {
 
 # Spawn off a terminal window to run ourself again
 if [[ $SLAVE -eq 0 ]]; then
-    exec $XTERMINAL -e "$0 -s"
+    exec $XTERMINAL $CLS -e "$0 -s"
 fi
 
 tmp=$(mktemp)
@@ -102,7 +104,7 @@ if [[ -n $diffs ]]; then
     msg="Continue Arch software upgrade?"
     if [ $CMDLINE -eq 0 ]; then
 	echo $PROMPT
-	if ! zenity --icon-name arch-upgrade --title "" --question \
+	if ! zenity $CLS --icon-name arch-upgrade --title "" --question \
 	    --text "$msg"; then
 	    exit 0
 	fi
@@ -128,7 +130,7 @@ if ! $ARCH_UPGRADE; then
     echo
     echo "##### $msg #####"
     if [ $CMDLINE -eq 0 ]; then
-	zenity --title "" --error --text "$msg"
+	zenity $CLS --title "" --error --text "$msg"
     fi
     exit 1
 fi
@@ -137,6 +139,6 @@ msg="Arch software upgrade finished."
 echo
 echo "##### $msg #####"
 if [ $CMDLINE -eq 0 ]; then
-    zenity --icon-name arch-upgrade --title "" --info --text "$msg"
+    zenity $CLS --icon-name arch-upgrade --title "" --info --text "$msg"
 fi
 exit 0

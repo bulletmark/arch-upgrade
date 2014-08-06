@@ -6,3 +6,4 @@ Exec=arch-upgrade
 Icon=arch-upgrade.png
 Comment=Wrapper script to run Arch system upgrade
 Categories=System
+StartupWMClass=ArchUpgrade
