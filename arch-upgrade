@@ -101,6 +101,8 @@ if [[ -n $diffs ]]; then
     echo "*** WARNING - ARCH NEWS UPDATE ***:"
     echo "$diffs"
     echo
+    echo "Read details at $NEWSURL"
+    echo
     msg="Continue Arch software upgrade?"
     if [ $CMDLINE -eq 0 ]; then
 	echo $PROMPT
