@@ -102,15 +102,14 @@ if [[ -n $diffs ]]; then
     echo "$diffs"
     echo
     echo "Read details at $NEWSURL"
-    echo
     msg="Continue Arch software upgrade?"
     if [ $CMDLINE -eq 0 ]; then
-	echo $PROMPT
 	if ! zenity $CLS --icon-name arch-upgrade --title "" --question \
 	    --text "$msg"; then
 	    exit 0
 	fi
     else
+	echo
 	if ! ask "$msg" N; then
 	    exit 0
 	fi
