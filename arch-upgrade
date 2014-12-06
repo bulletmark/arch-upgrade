@@ -78,17 +78,15 @@ if [[ $SLAVE -eq 0 ]]; then
 fi
 
 tmp=$(mktemp)
-tmp2=$(mktemp)
-trap "rm -f $tmp $tmp2; exit" 0 1 2 3 15
+trap "rm -f $tmp; exit" 0 1 2 3 15
 
 echo "##### Arch software upgrade starting #####"
 echo
 echo "Fetching latest Arch news .."
 
 # Grab latest news and report any new news items
-curl -silent "$NEWSURL" >$tmp2
-# Note new html2text won't accept standard input
-html2text --ignore-emphasis --ignore-links --ignore-images $tmp2 |
+curl -silent "$NEWSURL" |
+html2text --ignore-emphasis --ignore-links --ignore-images |
 grep '^20[0-9][0-9]-' | head -$NUMNEWS >$tmp
 
 if [[ -f $LAST ]]; then
