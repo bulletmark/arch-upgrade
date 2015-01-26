@@ -96,7 +96,6 @@ else
 fi
 
 if [[ -n $diffs ]]; then
-    mv $tmp $LAST
     # If new news then stop and prompt
     echo
     echo "*** WARNING - ARCH NEWS UPDATE ***:"
@@ -115,6 +114,9 @@ if [[ -n $diffs ]]; then
 	    exit 0
 	fi
     fi
+
+    # Update stamp file now the user has chosen to proceed
+    mv $tmp $LAST
 else
     echo
     echo "No Arch news updates."
