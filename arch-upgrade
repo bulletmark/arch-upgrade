@@ -84,6 +84,10 @@ echo "##### Arch software upgrade starting #####"
 echo
 echo "Fetching latest Arch news .."
 
+if [ $CMDLINE -ne 0 ]; then
+    unset DISPLAY
+fi
+
 # Grab latest news and report any new news items
 curl -silent "$NEWSURL" |
 html2text --ignore-emphasis --ignore-links --ignore-images |
