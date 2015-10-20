@@ -39,7 +39,7 @@ done
 
 shift $((OPTIND - 1))
 
-if [ $# -ne 0 ]; then
+if [[ $# -ne 0 ]]; then
     usage
 fi
 
@@ -48,10 +48,10 @@ ask() {
     # Arg 1 is question prompt to user
     # Arg 2 is optional "Y" or "N" default
     while true; do
-        if [ "$2" = "Y" ]; then
+        if [[ "$2" = "Y" ]]; then
             prompt="Y/n"
             default="Y"
-        elif [ "$2" = "N" ]; then
+        elif [[ "$2" = "N" ]]; then
             prompt="y/N"
             default="N"
         else
@@ -63,7 +63,7 @@ ask() {
         read -p "$1 [$prompt] " REPLY
 
         # Default?
-        if [ -z "$REPLY" ]; then
+        if [[ -z "$REPLY" ]]; then
             REPLY=$default
         fi
 
@@ -84,19 +84,19 @@ tmp=$(mktemp)
 trap "rm -f $tmp; exit" 0 1 2 3 15
 
 echo "##### Arch software upgrade starting #####"
-echo
-echo "Fetching latest Arch news .."
 
-if [ $CMDLINE -ne 0 ]; then
+if [[ $CMDLINE -ne 0 ]]; then
     unset DISPLAY
 fi
 
 # Grab latest news and report any new news items
-if [ $NEWS -ne 0 ]; then
+if [[ $NEWS -ne 0 ]]; then
     if ! which html2text &>/dev/null; then
 	echo "ERROR: Please install html2text utility." >&2
 	exit 1
     fi
+    echo
+    echo "Fetching latest Arch news .."
     curl -silent "$NEWSURL" |
     html2text --ignore-emphasis --ignore-links --ignore-images |
     grep '^20[0-9][0-9]-' | head -$NUMNEWS >$tmp
@@ -115,7 +115,7 @@ if [ $NEWS -ne 0 ]; then
 	echo
 	echo "Read details at $NEWSURL"
 	msg="Continue Arch software upgrade?"
-	if [ $CMDLINE -eq 0 ]; then
+	if [[ $CMDLINE -eq 0 ]]; then
 	    if ! zenity $CLS --icon-name arch-upgrade --title "" --question \
 		--text "$msg"; then
 		exit 0
@@ -146,7 +146,7 @@ if ! $ARCH_UPGRADE; then
     msg="Arch software upgrade finished with ERROR."
     echo
     echo "##### $msg #####"
-    if [ $CMDLINE -eq 0 ]; then
+    if [[ $CMDLINE -eq 0 ]]; then
 	zenity $CLS --title "" --error --text "$msg"
     fi
     exit 1
@@ -155,7 +155,7 @@ fi
 msg="Arch software upgrade finished."
 echo
 echo "##### $msg #####"
-if [ $CMDLINE -eq 0 ]; then
+if [[ $CMDLINE -eq 0 ]]; then
     zenity $CLS --icon-name arch-upgrade --title "" --info --text "$msg"
 fi
 exit 0

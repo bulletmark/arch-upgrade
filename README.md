@@ -8,14 +8,14 @@ updates on the Arch news feed.
 
 ### INSTALLATION
 
-    sudo pacman -S zenity html2text git
+    sudo pacman -S zenity python-html2text git
     git clone http://github.com/bulletmark/arch-upgrade
     cd arch-upgrade
     make install     # can also do this as root to install globally
 
 Then install [Yaourt](http://wiki.archlinux.org/index.php/yaourt) from
 the AUR. Or use another package manager and set ARCH_UPGRADE in your
-environment.
+environment (e.g. via ~/.bashrc).
 
 ### REMOVAL
 
