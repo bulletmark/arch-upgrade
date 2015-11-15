@@ -10,6 +10,9 @@ XTERMINAL="gnome-terminal"
 NUMNEWS=10
 NEWSURL="https://www.archlinux.org/news/"
 
+MIRLIST=/etc/pacman.d/mirrorlist
+NEWLIST=$MIRLIST.pacnew
+
 PROG=$(basename $0)
 LAST=$HOME/.$PROG
 
@@ -21,6 +24,7 @@ usage() {
     echo "-s (run as slave, i.e. do not start and run in a new $XTERMINAL)"
     echo "-c (run directly in command line, with no GUI prompts)"
     echo "-n (skip fetch and check/report of latest news)"
+    echo "-m (skip check/report of mirrorlist file update)"
     exit 1
 }
 
@@ -28,11 +32,13 @@ usage() {
 SLAVE=0
 CMDLINE=0
 NEWS=1
-while getopts scn c; do
+MIRROR=1
+while getopts scnm c; do
     case $c in
     s) SLAVE=1;;
     c) SLAVE=1;CMDLINE=1;;
     n) NEWS=0;;
+    m) MIRROR=0;;
     ?) usage;;
     esac
 done
@@ -150,6 +156,15 @@ if ! $ARCH_UPGRADE; then
 	zenity $CLS --title "" --error --text "$msg"
     fi
     exit 1
+fi
+
+if [ $MIRROR -ne 0 -a -f $MIRLIST -a -f $NEWLIST ]; then
+    sed '/^ *#/d' $MIRLIST | while read line; do
+    if ! grep -q " *#* *$line *$" $NEWLIST; then
+	echo
+	echo "Warning: $NEWLIST has been updated."
+    fi
+    done
 fi
 
 msg="Arch software upgrade finished."
