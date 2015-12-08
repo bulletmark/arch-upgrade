@@ -8,7 +8,7 @@ updates on the Arch news feed.
 
 ### INSTALLATION
 
-    sudo pacman -S zenity python-html2text git
+    sudo pacman -S zenity wmctrl python-html2text git
     git clone http://github.com/bulletmark/arch-upgrade
     cd arch-upgrade
     make install     # can also do this as root to install globally

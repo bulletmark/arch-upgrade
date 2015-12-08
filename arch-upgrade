@@ -16,7 +16,8 @@ NEWLIST=$MIRLIST.pacnew
 PROG=$(basename $0)
 LAST=$HOME/.$PROG
 
-CLS="--class ArchUpgrade"
+WMCLASS="ArchUpgrade"
+WMICON="arch-upgrade"
 
 usage() {
     echo "Usage: $PROG"
@@ -81,9 +82,18 @@ ask() {
     done
 }
 
+# Output a GUI prompt with given message.
+# We use wmctrl to keep the dialog on top of other windows.
+popup() {
+    local ztype="$1"
+    local msg="$2"
+    (sleep 1 && wmctrl -xa $WMCLASS -I $WMICON -b add,above)&
+    zenity --class $WMCLASS --icon-name $WMICON --$ztype --title "" --text "$msg"
+}
+
 # Spawn off a terminal window to run ourself again
 if [[ $SLAVE -eq 0 ]]; then
-    exec $XTERMINAL $CLS --geometry 132x46 -e "$0 -s"
+    exec $XTERMINAL --class $WMCLASS --geometry 132x46 -e "$0 -s"
 fi
 
 tmp=$(mktemp)
@@ -122,8 +132,7 @@ if [[ $NEWS -ne 0 ]]; then
 	echo "Read details at $NEWSURL"
 	msg="Continue Arch software upgrade?"
 	if [[ $CMDLINE -eq 0 ]]; then
-	    if ! zenity $CLS --icon-name arch-upgrade --title "" --question \
-		--text "$msg"; then
+	    if ! popup question "$msg"; then
 		exit 0
 	    fi
 	else
@@ -153,7 +162,7 @@ if ! $ARCH_UPGRADE; then
     echo
     echo "##### $msg #####"
     if [[ $CMDLINE -eq 0 ]]; then
-	zenity $CLS --title "" --error --text "$msg"
+	popup error "$msg"
     fi
     exit 1
 fi
@@ -171,6 +180,6 @@ msg="Arch software upgrade finished."
 echo
 echo "##### $msg #####"
 if [[ $CMDLINE -eq 0 ]]; then
-    zenity $CLS --icon-name arch-upgrade --title "" --info --text "$msg"
+    popup info "$msg"
 fi
 exit 0
