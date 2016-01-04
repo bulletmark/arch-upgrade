@@ -155,7 +155,7 @@ echo "Performing Arch software update and upgrade .."
 
 # Can redefine following env variable to use different package manager
 echo
-echo ${ARCH_UPGRADE:="yaourt -Syua --devel --noconfirm"}
+echo ${ARCH_UPGRADE:="yaourt -Syua --noconfirm"}
 
 if ! $ARCH_UPGRADE; then
     msg="Arch software upgrade finished with ERROR."
