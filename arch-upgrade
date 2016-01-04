@@ -24,6 +24,7 @@ usage() {
     echo "Options:"
     echo "-s (run as slave, i.e. do not start and run in a new $XTERMINAL)"
     echo "-c (run directly in command line, with no GUI prompts)"
+    echo "-d (include development packages in upgrade)"
     echo "-n (skip fetch and check/report of latest news)"
     echo "-m (skip check/report of mirrorlist file update)"
     exit 1
@@ -32,14 +33,16 @@ usage() {
 # Process command line options
 SLAVE=0
 CMDLINE=0
-NEWS=1
-MIRROR=1
-while getopts scnm c; do
+DEVEL=""
+NEWS=""
+MIRROR=""
+while getopts scdnm c; do
     case $c in
     s) SLAVE=1;;
     c) SLAVE=1;CMDLINE=1;;
-    n) NEWS=0;;
-    m) MIRROR=0;;
+    d) DEVEL="-d";;
+    n) NEWS="-n";;
+    m) MIRROR="-m";;
     ?) usage;;
     esac
 done
@@ -93,7 +96,8 @@ popup() {
 
 # Spawn off a terminal window to run ourself again
 if [[ $SLAVE -eq 0 ]]; then
-    exec $XTERMINAL --class $WMCLASS --geometry 132x46 -e "$0 -s"
+    exec $XTERMINAL --class $WMCLASS --geometry 132x46 -e \
+       	"$0 -s $DEVEL $NEWS $MIRROR"
 fi
 
 tmp=$(mktemp)
@@ -106,7 +110,7 @@ if [[ $CMDLINE -ne 0 ]]; then
 fi
 
 # Grab latest news and report any new news items
-if [[ $NEWS -ne 0 ]]; then
+if [[ -z "$NEWS" ]]; then
     if ! which html2text &>/dev/null; then
 	echo "ERROR: Please install html2text utility." >&2
 	exit 1
@@ -153,9 +157,13 @@ fi
 echo
 echo "Performing Arch software update and upgrade .."
 
+if [[ -n "$DEVEL" ]]; then
+    DEVEL="--devel"
+fi
+
 # Can redefine following env variable to use different package manager
 echo
-echo ${ARCH_UPGRADE:="yaourt -Syua --noconfirm"}
+echo ${ARCH_UPGRADE:="yaourt -Syua --noconfirm $DEVEL"}
 
 if ! $ARCH_UPGRADE; then
     msg="Arch software upgrade finished with ERROR."
@@ -167,7 +175,7 @@ if ! $ARCH_UPGRADE; then
     exit 1
 fi
 
-if [ $MIRROR -ne 0 -a -f $MIRLIST -a -f $NEWLIST ]; then
+if [ -z "$MIRROR" -a -f $MIRLIST -a -f $NEWLIST ]; then
     sed '/^ *#/d' $MIRLIST | while read line; do
     if ! grep -q " *#* *$line *$" $NEWLIST; then
 	echo
