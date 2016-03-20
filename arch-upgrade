@@ -167,11 +167,13 @@ if [[ -n "$DEVEL" ]]; then
     DEVEL="--devel"
 fi
 
-# Can redefine following env variable to use different package manager
+# Can redefine following env variable (e.g. in your ~/.profile) to use
+# different package manager. e.g:
+# export ARCH_UPGRADE:="pacaur -Syu --noconfirm --noedit"
 echo
-echo ${ARCH_UPGRADE:="yaourt -Syua --noconfirm $DEVEL"}
+echo ${ARCH_UPGRADE:="yaourt -Syua --noconfirm"}
 
-if ! $ARCH_UPGRADE; then
+if ! $ARCH_UPGRADE $DEVEL; then
     msg="Arch software upgrade finished with ERROR."
     echo
     echo "##### $msg #####"
