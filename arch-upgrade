@@ -14,7 +14,8 @@ MIRLIST=/etc/pacman.d/mirrorlist
 NEWLIST=$MIRLIST.pacnew
 
 PROG=$(basename $0)
-LAST=$HOME/.$PROG
+LAST=${XDG_CACHE_HOME:-$HOME/.cache}/$PROG.cache
+CONF=${XDG_CONFIG_HOME:-$HOME/.config}/$PROG.conf
 
 WMCLASS="ArchUpgrade"
 WMICON="arch-upgrade"
@@ -100,6 +101,12 @@ if [[ $SLAVE -eq 0 ]]; then
        	"$0 -s $DEVEL $NEWS $MIRROR"
 fi
 
+# Source config file if it exists. Can be used to override $ARCH_UPGRADE
+# variable to use a different AUR helper as seen below.
+if [ -f $CONF ]; then
+    source $CONF
+fi
+
 tmp=$(mktemp)
 trap "rm -f $tmp; exit" 0 1 2 3 15
 
@@ -153,6 +160,7 @@ if [[ -z "$NEWS" ]]; then
 	fi
 
 	# Update stamp file now the user has chosen to proceed
+	mkdir -p $(dirname $LAST)
 	mv $tmp $LAST
     else
 	echo
@@ -167,9 +175,9 @@ if [[ -n "$DEVEL" ]]; then
     DEVEL="--devel"
 fi
 
-# Can redefine following env variable (e.g. in your ~/.profile) to use
-# different package manager. e.g:
-# export ARCH_UPGRADE:="pacaur -Syu --noconfirm --noedit"
+# Can redefine/override following environment variable (e.g. add to the
+# $CONF config file, or in ~/.profile) to use different package manager.
+# e.g: export ARCH_UPGRADE:="pacaur -Syu --noconfirm --noedit"
 echo
 echo ${ARCH_UPGRADE:="yaourt -Syua --noconfirm"}
 
