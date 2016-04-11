@@ -2,9 +2,17 @@
 # Run an upgrade of an arch linux system in a new terminal window.
 # M.Blakeney.
 
+### Start conf ..
+# These variables can be overridden in your $CONF file.
+
+# Package manager we want to use.
+ARCH_UPGRADE="yaourt -Syua --noconfirm"
+
 # Terminal app we want to use. Arch doesn't use /etc/alternatives :(
 #XTERMINAL="x-terminal-emulator"
 XTERMINAL="gnome-terminal"
+
+### End conf
 
 # Number of lines of recent arch news we want to see
 NUMNEWS=10
@@ -95,16 +103,13 @@ popup() {
     zenity --class $WMCLASS --icon-name $WMICON --$ztype --title "" --text "$msg"
 }
 
-# Spawn off a terminal window to run ourself again
-if [[ $SLAVE -eq 0 ]]; then
-    exec $XTERMINAL --class $WMCLASS --geometry 132x46 -e \
-       	"$0 -s $DEVEL $NEWS $MIRROR"
-fi
-
-# Source config file if it exists. Can be used to override $ARCH_UPGRADE
-# variable to use a different AUR helper as seen below.
 if [ -f $CONF ]; then
     source $CONF
+fi
+
+# Spawn off a terminal window to run ourself again
+if [[ $SLAVE -eq 0 ]]; then
+    exec $XTERMINAL --class $WMCLASS -e "$0 -s $DEVEL $NEWS $MIRROR"
 fi
 
 tmp=$(mktemp)
