@@ -2,9 +2,9 @@
 
 Arch-upgrade is small desktop convenience app which can be placed in
 your [Arch Linux](http://www.archlinux.org) launcher/dock. Click on it
-to pop up a terminal window to upgrade your system. Click on the OK
-button when complete. Will prompt you to continue if there are news
-updates on the Arch news feed.
+to pop up a terminal window to upgrade your system and AUR packages.
+Click on the OK button when complete. Before updating, it will check and
+present Arch news notices since you last updated and prompt to proceed.
 
 ### INSTALLATION
 
@@ -13,9 +13,11 @@ updates on the Arch news feed.
     cd arch-upgrade
     make install     # can also do this as root to install globally
 
-Then install [Yaourt](http://wiki.archlinux.org/index.php/yaourt) from
-the AUR. Or use another package manager and set ARCH_UPGRADE in your
-environment (e.g. via ~/.bashrc).
+Then install [Yaourt](http://aur.archlinux.org/packages/yaourt/) from
+the AUR. Or create a file `$HOME/.config/arch-upgrade.conf` to specify
+an alternative package manager like
+[Pacaur](http://aur.archlinux.org/packages/pacaur/) and/or to use
+different options. See example conf file here.
 
 ### REMOVAL
 
