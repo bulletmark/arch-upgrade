@@ -30,6 +30,13 @@ different options. See example conf file here.
     git pull
     make install     # can also do this as root to update globally
 
+### COMMAND LINE
+
+You can also run directly on the command line. In this case it will not
+use GUI popups and will only prompt from the command line. Just type:
+
+    arch-upgrade -c
+
 ### LICENSE
 
 Copyright (C) 2014 Mark Blakeney. This program is distributed under the
