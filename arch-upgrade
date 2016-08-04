@@ -31,8 +31,8 @@ WMICON="arch-upgrade"
 usage() {
     echo "Usage: $PROG"
     echo "Options:"
-    echo "-s (run as slave, i.e. do not start and run in a new $XTERMINAL)"
-    echo "-c (run directly in command line, with no GUI prompts)"
+    echo "-t (run within a new terminal with GUI prompts)"
+    echo "-g (run with GUI prompts)"
     echo "-d (include development packages in upgrade)"
     echo "-n (skip fetch and check/report of latest news)"
     echo "-m (skip check/report of mirrorlist file update)"
@@ -40,15 +40,15 @@ usage() {
 }
 
 # Process command line options
-SLAVE=0
-CMDLINE=0
+NEWTERM=0
+GUI=0
 DEVEL=""
 NEWS=""
 MIRROR=""
-while getopts scdnm c; do
+while getopts tgdnm c; do
     case $c in
-    s) SLAVE=1;;
-    c) SLAVE=1;CMDLINE=1;;
+    t) GUI=1;NEWTERM=1;;
+    g) GUI=1;;
     d) DEVEL="-d";;
     n) NEWS="-n";;
     m) MIRROR="-m";;
@@ -108,8 +108,8 @@ if [ -f $CONF ]; then
 fi
 
 # Spawn off a terminal window to run ourself again
-if [[ $SLAVE -eq 0 ]]; then
-    exec $XTERMINAL --class $WMCLASS -e "$0 -s $DEVEL $NEWS $MIRROR"
+if [[ $NEWTERM -ne 0 ]]; then
+    exec $XTERMINAL --class $WMCLASS -e "$0 -g $DEVEL $NEWS $MIRROR"
 fi
 
 tmp=$(mktemp)
@@ -123,7 +123,7 @@ fi
 
 echo "##### Arch software upgrade starting #####"
 
-if [[ $CMDLINE -ne 0 ]]; then
+if [[ $GUI -eq 0 ]]; then
     unset DISPLAY
 fi
 
@@ -153,7 +153,7 @@ if [[ -z "$NEWS" ]]; then
 	echo
 	echo "Read details at $NEWSURL"
 	msg="Continue Arch software upgrade?"
-	if [[ $CMDLINE -eq 0 ]]; then
+	if [[ $GUI -ne 0 ]]; then
 	    if ! popup question "$msg"; then
 		exit 0
 	    fi
@@ -190,7 +190,7 @@ if ! $ARCH_UPGRADE $DEVEL; then
     msg="Arch software upgrade finished with ERROR."
     echo
     echo "##### $msg #####"
-    if [[ $CMDLINE -eq 0 ]]; then
+    if [[ $GUI -ne 0 ]]; then
 	popup error "$msg"
     fi
     exit 1
@@ -208,7 +208,7 @@ fi
 msg="Arch software upgrade finished."
 echo
 echo "##### $msg #####"
-if [[ $CMDLINE -eq 0 ]]; then
+if [[ $GUI -ne 0 ]]; then
     popup info "$msg"
 fi
 exit 0

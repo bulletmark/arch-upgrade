@@ -35,7 +35,7 @@ different options. See example conf file here.
 You can also run directly on the command line. In this case it will not
 use GUI popups and will only prompt from the command line. Just type:
 
-    arch-upgrade -c
+    arch-upgrade
 
 ### LICENSE
 

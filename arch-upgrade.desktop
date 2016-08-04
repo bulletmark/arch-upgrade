@@ -2,7 +2,7 @@
 Name=Arch Linux Upgrade
 Type=Application
 Terminal=false
-Exec=arch-upgrade
+Exec=arch-upgrade -t
 Icon=arch-upgrade.png
 Comment=Wrapper script to run Arch system upgrade
 Categories=System
