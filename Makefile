@@ -17,14 +17,13 @@ DOC = README.md
 DOCOUT = $(DOC:.md=.html)
 
 all:
-	@echo "Type make install or uninstall."
-	@echo "Do as ordinary user. Or as root to install globally for all users."
+	@echo "Type sudo make install|uninstall"
 
 install:
-	@./install.sh
+	@./arch-upgrade-setup -d "$(DESTDIR)" install
 
 uninstall:
-	@./install.sh -r
+	@./arch-upgrade-setup -d "$(DESTDIR)" uninstall
 
 doc:	$(DOCOUT)
 

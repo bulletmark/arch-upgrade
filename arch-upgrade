@@ -3,10 +3,10 @@
 # M.Blakeney.
 
 ### Start conf ..
-# These variables can be overridden in your $CONF file.
+# These variables can be overridden in your personal configuration file.
 
 # Package manager we want to use.
-ARCH_UPGRADE="yaourt -Syua --noconfirm"
+ARCH_UPGRADE="pacaur -Syu --noconfirm --noedit"
 
 # Terminal app we want to use. Arch doesn't use /etc/alternatives :(
 #XTERMINAL="x-terminal-emulator"
@@ -21,9 +21,9 @@ NEWSURL="https://www.archlinux.org/news/"
 MIRLIST=/etc/pacman.d/mirrorlist
 NEWLIST=$MIRLIST.pacnew
 
-PROG=$(basename $0)
-LAST=${XDG_CACHE_HOME:-$HOME/.cache}/$PROG.cache
-CONF=${XDG_CONFIG_HOME:-$HOME/.config}/$PROG.conf
+PROG="$(basename $0)"
+LAST="${XDG_CACHE_HOME:-$HOME/.cache}/$PROG.cache"
+CONF="${XDG_CONFIG_HOME:-$HOME/.config}/$PROG.conf /etc/$PROG.conf"
 
 WMCLASS="ArchUpgrade"
 WMICON="arch-upgrade"
@@ -103,8 +103,18 @@ popup() {
     zenity --class $WMCLASS --icon-name $WMICON --$ztype --title "" --text "$msg"
 }
 
-if [ -f $CONF ]; then
-    source $CONF
+for conf in $CONF; do
+    if [ -f $conf ]; then
+	source $conf
+	break
+    fi
+    conf=""
+done
+
+if [ -z "$conf" ]; then
+    echo "ERROR: No configuration file found at any of:" >&2
+    echo "  $CONF" >&2
+    exit 1
 fi
 
 # Spawn off a terminal window to run ourself again
@@ -182,9 +192,8 @@ fi
 
 # Can redefine/override following environment variable (e.g. add to the
 # $CONF config file, or in ~/.profile) to use different package manager.
-# e.g: export ARCH_UPGRADE:="pacaur -Syu --noconfirm --noedit"
 echo
-echo ${ARCH_UPGRADE:="yaourt -Syua --noconfirm"}
+echo ${ARCH_UPGRADE}
 
 if ! $ARCH_UPGRADE $DEVEL; then
     msg="Arch software upgrade finished with ERROR."
