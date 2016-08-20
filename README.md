@@ -28,9 +28,10 @@ alternative package manager like
 [Yaourt](http://aur.archlinux.org/packages/yaourt/). You can also
 specify different options to the package manager.
 
-NOTE: Previous versions of _arch-upgrade_ installed locally as user
-files so to ensure that any old user configuration is removed type the
-following as your normal user (i.e. not sudo/root).
+NOTE: _Arch-upgrade_ now installs system-wide but older versions of
+_arch-upgrade_ installed as local user files so to ensure that any old
+user configuration is removed type the following as your normal user
+(i.e. not sudo/root).
 
     arch-upgrade-setup clean
 
