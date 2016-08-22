@@ -5,13 +5,17 @@ your [Arch Linux](http://www.archlinux.org) launcher/dock. Click on it
 to pop up a terminal window to upgrade your system and AUR packages.
 Click on the OK button when complete. Before updating, it will check and
 present Arch news notices since you last updated and prompt to proceed.
+You can also run it directly on the command line with or without the GUI
+prompts.
 
 ### INSTALLATION
 
 NOTE: Arch users can just install
 [_arch-upgrade from the AUR_](https://aur.archlinux.org/packages/arch-upgrade/) and skip to the next section.
 
-    sudo pacman -S zenity wmctrl python-html2text git
+    # Install python-html2text + git
+    # Install zenity + wmctrl if you are going to use the GUI, i.e. not
+    # just on the command line.
     git clone http://github.com/bulletmark/arch-upgrade
     cd arch-upgrade
     sudo make install
@@ -28,24 +32,23 @@ alternative package manager like
 [Yaourt](http://aur.archlinux.org/packages/yaourt/). You can also
 specify different options to the package manager.
 
-NOTE: _Arch-upgrade_ now installs system-wide but older versions of
-_arch-upgrade_ installed as local user files so to ensure that any old
-user configuration is removed type the following as your normal user
-(i.e. not sudo/root).
+NOTE: _Arch-upgrade_ now installs system-wide but old versions installed
+as local user files so to ensure that any old user configuration is
+removed type the following as your normal user (i.e. not sudo/root).
 
     arch-upgrade-setup clean
 
 You can type this any time so no harm is done running it to make sure.
-
-### REMOVAL
-
-    sudo arch-upgrade-setup uninstall
 
 ### UPGRADE
 
     cd arch-upgrade  # Source dir, as above
     git pull
     sudo make install
+
+### REMOVAL
+
+    sudo arch-upgrade-setup uninstall
 
 ### COMMAND LINE
 

@@ -62,6 +62,18 @@ if [[ $# -ne 0 ]]; then
     usage
 fi
 
+# If using GUI then check for required packages.
+if [ $GUI -ne 0 ]; then
+    if ! which zenity &>/dev/null; then
+	echo "ERROR: Please install zenity." >&2
+	exit 1
+    fi
+    if ! which wmctrl &>/dev/null; then
+	echo "ERROR: Please install wmctrl." >&2
+	exit 1
+    fi
+fi
+
 # Function to read yes/no response
 ask() {
     # Arg 1 is question prompt to user
