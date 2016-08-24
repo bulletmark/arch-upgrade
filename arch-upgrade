@@ -62,22 +62,11 @@ if [[ $# -ne 0 ]]; then
     usage
 fi
 
-# If using GUI then check for required packages.
-if [ $GUI -ne 0 ]; then
-    if ! which zenity &>/dev/null; then
-	echo "ERROR: Please install zenity." >&2
-	exit 1
-    fi
-    if ! which wmctrl &>/dev/null; then
-	echo "ERROR: Please install wmctrl." >&2
-	exit 1
-    fi
-fi
-
 # Function to read yes/no response
 ask() {
     # Arg 1 is question prompt to user
     # Arg 2 is optional "Y" or "N" default
+    echo
     while true; do
         if [[ "$2" = "Y" ]]; then
             prompt="Y/n"
@@ -106,13 +95,52 @@ ask() {
     done
 }
 
-# Output a GUI prompt with given message.
-# We use wmctrl to keep the dialog on top of other windows.
-popup() {
-    local ztype="$1"
+# Output a GUI or command line prompt with given message.
+message() {
+    local mtype="$1"
     local msg="$2"
-    (sleep 1 && wmctrl -xa $WMCLASS -I $WMICON -b add,above)&
-    zenity --class $WMCLASS --icon-name $WMICON --$ztype --title "" --text "$msg"
+    local def="$3"
+
+    res=0
+    if [ $GUI -eq 0 ]; then
+	if [ "$mtype" = question ]; then
+	    ask "$msg" "$def"
+	    res=$?
+	elif [ "$mtype" = error ]; then
+	    echo
+	    echo -e "ERROR: $msg"
+	    exit 1
+	else
+	    echo
+	    echo -e "$msg"
+	fi
+    else
+	# Using GUI so check for required packages.
+	if ! which zenity &>/dev/null; then
+	    ask "ERROR: Please install zenity." Y
+	    exit 1
+	fi
+
+	# We use wmctrl to keep the dialog on top of other windows.
+	if ! which wmctrl &>/dev/null; then
+	    ask "ERROR: Please install wmctrl." Y
+	    exit 1
+	fi
+
+	if [ "$mtype" = error ]; then
+	    msg="ERROR: $msg"
+	fi
+
+	(sleep 1 && wmctrl -xa $WMCLASS -I $WMICON -b add,above)&
+	zenity --class $WMCLASS --icon-name $WMICON --$mtype \
+	    --title "" --text "$msg"
+	res=$?
+	if [ "$mtype" = error ]; then
+	    exit 1
+	fi
+    fi
+
+    return $res
 }
 
 for conf in $CONF; do
@@ -123,15 +151,13 @@ for conf in $CONF; do
     conf=""
 done
 
-if [ -z "$conf" ]; then
-    echo "ERROR: No configuration file found at any of:" >&2
-    echo "  $CONF" >&2
-    exit 1
-fi
-
 # Spawn off a terminal window to run ourself again
 if [[ $NEWTERM -ne 0 ]]; then
     exec $XTERMINAL --class $WMCLASS -e "$0 -g $DEVEL $NEWS $MIRROR"
+fi
+
+if [ -z "$conf" ]; then
+    message error "No configuration file found at any of:\n\n$CONF"
 fi
 
 tmp=$(mktemp)
@@ -139,8 +165,7 @@ trap "rm -f $tmp; exit" 0 1 2 3 15
 
 exec 200>"/tmp/$PROG"
 if ! flock -n 200; then
-    echo "ERROR: $PROG is already running!" >&2
-    exit 1
+    message error "$PROG is already running!"
 fi
 
 echo "##### Arch software upgrade starting #####"
@@ -152,8 +177,7 @@ fi
 # Grab latest news and report any new news items
 if [[ -z "$NEWS" ]]; then
     if ! which html2text &>/dev/null; then
-	echo "ERROR: Please install html2text utility." >&2
-	exit 1
+	message error "Please install html2text utility."
     fi
     echo
     echo "Fetching latest Arch news .."
@@ -174,16 +198,8 @@ if [[ -z "$NEWS" ]]; then
 	echo "$diffs"
 	echo
 	echo "Read details at $NEWSURL"
-	msg="Continue Arch software upgrade?"
-	if [[ $GUI -ne 0 ]]; then
-	    if ! popup question "$msg"; then
-		exit 0
-	    fi
-	else
-	    echo
-	    if ! ask "$msg" N; then
-		exit 0
-	    fi
+	if ! message question "Continue Arch software upgrade?" N; then
+	    exit 0
 	fi
 
 	# Update stamp file now the user has chosen to proceed
@@ -208,28 +224,22 @@ echo
 echo ${ARCH_UPGRADE}
 
 if ! $ARCH_UPGRADE $DEVEL; then
-    msg="Arch software upgrade finished with ERROR."
-    echo
-    echo "##### $msg #####"
-    if [[ $GUI -ne 0 ]]; then
-	popup error "$msg"
-    fi
-    exit 1
+    message error "Arch software upgrade finished with ERROR."
 fi
 
 if [ -z "$MIRROR" -a -f $MIRLIST -a -f $NEWLIST ]; then
     sed '/^ *#/d' $MIRLIST | while read line; do
-    if ! grep -q " *#* *$line *$" $NEWLIST; then
-	echo
-	echo "Warning: $NEWLIST has been updated."
-    fi
+	if ! grep -q " *#* *$line *$" $NEWLIST; then
+	    message info "Arch software upgrade completed.\n\nNote that $NEWLIST has been updated."
+	    exit 1
+	fi
     done
+
+    # Test whether above pipe-line terminated early
+    if [ $? != 0 ]; then
+	exit 0
+    fi
 fi
 
-msg="Arch software upgrade finished."
-echo
-echo "##### $msg #####"
-if [[ $GUI -ne 0 ]]; then
-    popup info "$msg"
-fi
+message info "Arch software upgrade completed."
 exit 0
