@@ -9,7 +9,8 @@ Arch news notices since you last updated and prompt to proceed. You can
 also run it directly on the command line with or without the GUI
 prompts.
 
-The latest version is available at http://github.com/bulletmark/arch-upgrade.
+The latest version and documentation is available at
+http://github.com/bulletmark/arch-upgrade.
 
 ### INSTALLATION
 
