@@ -8,10 +8,6 @@
 # Package manager we want to use.
 ARCH_UPGRADE="pacaur -Syu --noconfirm --noedit"
 
-# Terminal app we want to use. Arch doesn't use /etc/alternatives :(
-#XTERMINAL="x-terminal-emulator"
-XTERMINAL="gnome-terminal"
-
 ### End conf
 
 # Number of lines of recent arch news we want to see
@@ -31,7 +27,6 @@ WMICON="arch-upgrade"
 usage() {
     echo "Usage: $PROG"
     echo "Options:"
-    echo "-t (run within a new terminal with GUI prompts)"
     echo "-g (run with GUI prompts)"
     echo "-d (include development packages in upgrade)"
     echo "-n (skip fetch and check/report of latest news)"
@@ -40,14 +35,12 @@ usage() {
 }
 
 # Process command line options
-NEWTERM=0
 GUI=0
 DEVEL=""
 NEWS=""
 MIRROR=""
-while getopts tgdnm c; do
+while getopts gdnm c; do
     case $c in
-    t) GUI=1;NEWTERM=1;;
     g) GUI=1;;
     d) DEVEL="-d";;
     n) NEWS="-n";;
@@ -150,11 +143,6 @@ for conf in $CONF; do
     fi
     conf=""
 done
-
-# Spawn off a terminal window to run ourself again
-if [[ $NEWTERM -ne 0 ]]; then
-    exec $XTERMINAL --class $WMCLASS -e "$0 -g $DEVEL $NEWS $MIRROR"
-fi
 
 if [ -z "$conf" ]; then
     message error "No configuration file found at any of:\n\n$CONF"
