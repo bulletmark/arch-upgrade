@@ -4,10 +4,10 @@
 desktop convenience app which can be placed in your
 [Arch Linux](http://www.archlinux.org) launcher/dock. Click on it to pop
 up a terminal window to upgrade your system and AUR packages. Click on
-the OK button when complete. Before updating, it will check and present
-Arch news notices since you last updated and prompt to proceed. You can
-also run it directly on the command line with or without the GUI
-prompts.
+the OK button when complete. Before updating, it will present a prompt
+for new Arch news notices that have been posted since you last
+updated. You can also run `arch-upgrade` directly on the command line, with or
+without GUI prompts.
 
 The latest version and documentation is available at
 http://github.com/bulletmark/arch-upgrade.
