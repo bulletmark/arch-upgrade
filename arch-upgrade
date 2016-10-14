@@ -109,13 +109,13 @@ message() {
 	fi
     else
 	# Using GUI so check for required packages.
-	if ! which zenity &>/dev/null; then
+	if ! hash zenity &>/dev/null; then
 	    ask "ERROR: Please install zenity." Y
 	    exit 1
 	fi
 
 	# We use wmctrl to keep the dialog on top of other windows.
-	if ! which wmctrl &>/dev/null; then
+	if ! hash wmctrl &>/dev/null; then
 	    ask "ERROR: Please install wmctrl." Y
 	    exit 1
 	fi
@@ -164,7 +164,7 @@ fi
 
 # Grab latest news and report any new news items
 if [[ -z "$NEWS" ]]; then
-    if ! which html2text &>/dev/null; then
+    if ! hash html2text &>/dev/null; then
 	message error "Please install html2text utility."
     fi
     echo
