@@ -148,13 +148,13 @@ if [ -z "$conf" ]; then
     message error "No configuration file found at any of:\n\n$CONF"
 fi
 
-tmp=$(mktemp)
-trap "rm -f $tmp; exit" 0 1 2 3 15
-
 exec 200>"/tmp/$PROG"
 if ! flock -n 200; then
     message error "$PROG is already running!"
 fi
+
+tmp=$(mktemp)
+trap "rm -f $tmp /tmp/$PROG; exit" 0 1 2 3 15
 
 echo "##### Arch software upgrade starting #####"
 
