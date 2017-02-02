@@ -200,7 +200,7 @@ if [[ -z "$NEWS" ]]; then
 fi
 
 echo
-echo "Performing Arch software update and upgrade .."
+echo "Performing Arch software upgrade, using $conf."
 
 if [[ -n "$DEVEL" ]]; then
     DEVEL="--devel"
