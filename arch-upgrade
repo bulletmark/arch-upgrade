@@ -31,6 +31,9 @@ usage() {
     echo "-d (include development packages in upgrade)"
     echo "-n (skip fetch and check/report of latest news)"
     echo "-m (skip check/report of mirrorlist file update)"
+    echo "-c <conffile> (alternative configuration file)"
+    echo
+    echo -e "The configuration file used is the first found of:\n$CONF"
     exit 1
 }
 
@@ -39,12 +42,14 @@ GUI=0
 DEVEL=""
 NEWS=""
 MIRROR=""
-while getopts gdnm c; do
+FCONF=""
+while getopts gdnmc: c; do
     case $c in
     g) GUI=1;;
     d) DEVEL="-d";;
     n) NEWS="-n";;
     m) MIRROR="-m";;
+    c) FCONF="$OPTARG";;
     ?) usage;;
     esac
 done
@@ -136,16 +141,23 @@ message() {
     return $res
 }
 
-for conf in $CONF; do
-    if [ -f $conf ]; then
-	source $conf
-	break
+if [ -n "$FCONF" ]; then
+    if [ ! -r "$FCONF" ]; then
+	message error "Can not read configuration file \"$FCONF\"."
     fi
-    conf=""
-done
+    conf="$FCONF"
+else
+    for conf in $CONF; do
+	if [ -f $conf ]; then
+	    source $conf
+	    break
+	fi
+	conf=""
+    done
 
-if [ -z "$conf" ]; then
-    message error "No configuration file found at any of:\n\n$CONF"
+    if [ -z "$conf" ]; then
+	message error "No configuration file found at any of:\n\n$CONF"
+    fi
 fi
 
 exec 200>"/tmp/$PROG"
