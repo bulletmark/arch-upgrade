@@ -221,7 +221,7 @@ fi
 # Can redefine/override following environment variable (e.g. add to the
 # $CONF config file, or in ~/.profile) to use different package manager.
 echo
-echo ${ARCH_UPGRADE}
+echo $ARCH_UPGRADE $DEVEL
 
 if ! $ARCH_UPGRADE $DEVEL; then
     message error "Arch software upgrade finished with ERROR."
