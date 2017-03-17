@@ -114,13 +114,13 @@ message() {
 	fi
     else
 	# Using GUI so check for required packages.
-	if ! hash zenity &>/dev/null; then
+	if ! type zenity &>/dev/null; then
 	    ask "ERROR: Please install zenity." Y
 	    exit 1
 	fi
 
 	# We use wmctrl to keep the dialog on top of other windows.
-	if ! hash wmctrl &>/dev/null; then
+	if ! type wmctrl &>/dev/null; then
 	    ask "ERROR: Please install wmctrl." Y
 	    exit 1
 	fi
@@ -165,6 +165,12 @@ if ! flock -n 200; then
     message error "$PROG is already running!"
 fi
 
+read HELPER junk <<<$ARCH_UPGRADE
+if ! type $HELPER &>/dev/null; then
+    message error "AUR helper \"$HELPER\" is not installed."
+    exit 1
+fi
+
 tmp=$(mktemp)
 trap "rm -f $tmp /tmp/$PROG; exit" 0 1 2 3 15
 
@@ -176,7 +182,7 @@ fi
 
 # Grab latest news and report any new news items
 if [[ -z "$NEWS" ]]; then
-    if ! hash html2text &>/dev/null; then
+    if ! type html2text &>/dev/null; then
 	message error "Please install html2text utility."
     fi
     echo
