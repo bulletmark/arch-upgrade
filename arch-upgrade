@@ -182,12 +182,15 @@ fi
 
 # Grab latest news and report any new news items
 if [[ -z "$NEWS" ]]; then
+    if ! type curl &>/dev/null; then
+	message error "Please install curl utility."
+    fi
     if ! type html2text &>/dev/null; then
 	message error "Please install html2text utility."
     fi
     echo
     echo "Fetching latest Arch news .."
-    curl -silent "$NEWSURL" |
+    curl --silent "$NEWSURL" |
     html2text --ignore-emphasis --ignore-links --ignore-images |
     grep '^20[0-9][0-9]-' | head -$NUMNEWS >$tmp
 
