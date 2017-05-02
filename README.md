@@ -44,12 +44,6 @@ removed type the following as your normal user (i.e. not sudo/root).
 
 You can type this any time so no harm is done running it to make sure.
 
-NOTE: Currently on GNOME a [Wayland
-bug](https://bugzilla.gnome.org/show_bug.cgi?id=736660) can exhibit PATH
-and other errors doing updates so apply [this temporary
-fix](https://github.com/rmarquis/pacaur/issues/638#issuecomment-277485530)
-until the generic Wayland fix is formally released.
-
 ### UPGRADE
 
     cd arch-upgrade  # Source dir, as above
