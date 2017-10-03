@@ -17,7 +17,7 @@ http://github.com/bulletmark/arch-upgrade.
 NOTE: Arch users can just install
 [_arch-upgrade from the AUR_](https://aur.archlinux.org/packages/arch-upgrade/) and skip to the next section.
 
-    # Install curl, python-html2text, git
+    # Install curl, python-html2text, python-unidecode, git
     # Install zenity, wmctrl if you are going to use the GUI, i.e. not
     # just on the command line. E.g. you don't need these on a server.
     git clone http://github.com/bulletmark/arch-upgrade
