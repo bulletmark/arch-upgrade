@@ -1,8 +1,8 @@
 [Desktop Entry]
 Name=Arch Linux Upgrade
 Type=Application
-Terminal=false
-Exec=/usr/bin/arch-upgrade -t
+Terminal=true
+Exec=/usr/bin/arch-upgrade -g
 Icon=arch-upgrade
 Comment=Wrapper script to run Arch system upgrade
 Categories=System

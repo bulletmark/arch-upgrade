@@ -1,17 +1,25 @@
 ### ARCH LINUX UPGRADER
 
-Arch-upgrade is small desktop convenience app which can be placed in
-your [Arch Linux](http://www.archlinux.org) launcher/dock. Click on it
-to pop up a terminal window to upgrade your system and AUR packages.
-Click on the OK button when complete. Before updating, it will check and
-present Arch news notices since you last updated and prompt to proceed.
+[Arch-upgrade](http://github.com/bulletmark/arch-upgrade) is small
+desktop convenience app which can be placed in your
+[Arch Linux](http://www.archlinux.org) launcher/dock. Click on it to pop
+up a terminal window to upgrade your system and AUR packages. Click on
+the OK button when complete. Before updating, it will present a prompt
+for new Arch news notices that have been posted since you last
+updated. You can also run `arch-upgrade` directly on the command line, with or
+without GUI prompts.
+
+The latest version and documentation is available at
+http://github.com/bulletmark/arch-upgrade.
 
 ### INSTALLATION
 
 NOTE: Arch users can just install
 [_arch-upgrade from the AUR_](https://aur.archlinux.org/packages/arch-upgrade/) and skip to the next section.
 
-    sudo pacman -S zenity wmctrl python-html2text git
+    # Install curl, python-html2text, python-unidecode, git
+    # Install zenity, wmctrl if you are going to use the GUI, i.e. not
+    # just on the command line. E.g. you don't need these on a server.
     git clone http://github.com/bulletmark/arch-upgrade
     cd arch-upgrade
     sudo make install
@@ -28,24 +36,23 @@ alternative package manager like
 [Yaourt](http://aur.archlinux.org/packages/yaourt/). You can also
 specify different options to the package manager.
 
-NOTE: _Arch-upgrade_ now installs system-wide but older versions of
-_arch-upgrade_ installed as local user files so to ensure that any old
-user configuration is removed type the following as your normal user
-(i.e. not sudo/root).
+NOTE: _Arch-upgrade_ now installs system-wide but old versions installed
+as local user files so to ensure that any old user configuration is
+removed type the following as your normal user (i.e. not sudo/root).
 
     arch-upgrade-setup clean
 
 You can type this any time so no harm is done running it to make sure.
-
-### REMOVAL
-
-    sudo arch-upgrade-setup uninstall
 
 ### UPGRADE
 
     cd arch-upgrade  # Source dir, as above
     git pull
     sudo make install
+
+### REMOVAL
+
+    sudo arch-upgrade-setup uninstall
 
 ### COMMAND LINE
 

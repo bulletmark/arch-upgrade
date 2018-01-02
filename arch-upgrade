@@ -8,15 +8,10 @@
 # Package manager we want to use.
 ARCH_UPGRADE="pacaur -Syu --noconfirm --noedit"
 
-# Terminal app we want to use. Arch doesn't use /etc/alternatives :(
-#XTERMINAL="x-terminal-emulator"
-XTERMINAL="gnome-terminal"
-
 ### End conf
 
 # Number of lines of recent arch news we want to see
 NUMNEWS=10
-NEWSURL="https://www.archlinux.org/news/"
 
 MIRLIST=/etc/pacman.d/mirrorlist
 NEWLIST=$MIRLIST.pacnew
@@ -31,41 +26,49 @@ WMICON="arch-upgrade"
 usage() {
     echo "Usage: $PROG"
     echo "Options:"
-    echo "-t (run within a new terminal with GUI prompts)"
     echo "-g (run with GUI prompts)"
     echo "-d (include development packages in upgrade)"
     echo "-n (skip fetch and check/report of latest news)"
     echo "-m (skip check/report of mirrorlist file update)"
+    echo "-c <conffile> (alternative configuration file)"
+    echo
+    echo -e "The configuration file used is the first found of:\n$CONF"
     exit 1
 }
 
 # Process command line options
-NEWTERM=0
 GUI=0
 DEVEL=""
 NEWS=""
 MIRROR=""
-while getopts tgdnm c; do
+FCONF=""
+while getopts gdnmc: c; do
     case $c in
-    t) GUI=1;NEWTERM=1;;
     g) GUI=1;;
     d) DEVEL="-d";;
     n) NEWS="-n";;
     m) MIRROR="-m";;
+    c) FCONF="$OPTARG";;
     ?) usage;;
     esac
 done
 
-shift $((OPTIND - 1))
+shift "$((OPTIND - 1))"
 
-if [[ $# -ne 0 ]]; then
-    usage
-fi
+[ $# -ne 0 ] && usage
+
+# Trim lead/trail spaces from given string argument
+trim() {
+    local args="${*%% }"
+    args="${args## }"
+    echo "$args"
+}
 
 # Function to read yes/no response
 ask() {
     # Arg 1 is question prompt to user
     # Arg 2 is optional "Y" or "N" default
+    echo
     while true; do
         if [[ "$2" = "Y" ]]; then
             prompt="Y/n"
@@ -94,60 +97,116 @@ ask() {
     done
 }
 
-# Output a GUI prompt with given message.
-# We use wmctrl to keep the dialog on top of other windows.
-popup() {
-    local ztype="$1"
+# Output a GUI or command line prompt with given message.
+message() {
+    local mtype="$1"
     local msg="$2"
-    (sleep 1 && wmctrl -xa $WMCLASS -I $WMICON -b add,above)&
-    zenity --class $WMCLASS --icon-name $WMICON --$ztype --title "" --text "$msg"
+    local def="$3"
+
+    res=0
+    if [ $GUI -eq 0 ]; then
+	if [ "$mtype" = question ]; then
+	    ask "$msg" "$def"
+	    res=$?
+	elif [ "$mtype" = error ]; then
+	    echo
+	    echo -e "ERROR: $msg"
+	    exit 1
+	else
+	    echo
+	    echo -e "$msg"
+	fi
+    else
+	# Using GUI so check for required packages.
+	for prog in zenity wmctrl; do
+	    if ! type $prog &>/dev/null; then
+		ask "ERROR: Please install $prog." Y
+		exit 1
+	    fi
+	done
+
+	if [ "$mtype" = error ]; then
+	    msg="ERROR: $msg"
+	fi
+
+	(sleep 1 && wmctrl -xa $WMCLASS -I $WMICON -b add,above)&
+	zenity --class $WMCLASS --icon-name $WMICON --$mtype \
+	    --title "" --text "$msg" --ellipsize
+	res=$?
+	if [ "$mtype" = error ]; then
+	    exit 1
+	fi
+    fi
+
+    return $res
 }
 
-for conf in $CONF; do
-    if [ -f $conf ]; then
-	source $conf
-	break
+if [ -n "$FCONF" ]; then
+    if [ ! -r "$FCONF" ]; then
+	message error "Can not read configuration file \"$FCONF\"."
     fi
-    conf=""
-done
+    conf="$FCONF"
+else
+    for conf in $CONF; do
+	if [ -f $conf ]; then
+	    source $conf
+	    break
+	fi
+	conf=""
+    done
 
-if [ -z "$conf" ]; then
-    echo "ERROR: No configuration file found at any of:" >&2
-    echo "  $CONF" >&2
-    exit 1
+    if [ -z "$conf" ]; then
+	message error "No configuration file found at any of:\n\n$CONF"
+    fi
 fi
-
-# Spawn off a terminal window to run ourself again
-if [[ $NEWTERM -ne 0 ]]; then
-    exec $XTERMINAL --class $WMCLASS -e "$0 -g $DEVEL $NEWS $MIRROR"
-fi
-
-tmp=$(mktemp)
-trap "rm -f $tmp; exit" 0 1 2 3 15
 
 exec 200>"/tmp/$PROG"
 if ! flock -n 200; then
-    echo "ERROR: $PROG is already running!" >&2
+    message error "$PROG is already running!"
+fi
+
+read HELPER junk <<<$ARCH_UPGRADE
+if ! type $HELPER &>/dev/null; then
+    message error "AUR helper \"$HELPER\" is not installed."
     exit 1
 fi
 
+tmp=$(mktemp)
+tmp2=$(mktemp)
+trap "rm -f $tmp $tmp2 /tmp/$PROG; exit" 0 1 2 3 15
+
 echo "##### Arch software upgrade starting #####"
 
-if [[ $GUI -eq 0 ]]; then
-    unset DISPLAY
-fi
+[ $GUI -eq 0 ] && unset DISPLAY
 
 # Grab latest news and report any new news items
 if [[ -z "$NEWS" ]]; then
-    if ! which html2text &>/dev/null; then
-	echo "ERROR: Please install html2text utility." >&2
-	exit 1
-    fi
+    for prog in curl unidecode xmlstarlet; do
+	if ! type $prog &>/dev/null; then
+	    message error "Please install $prog utility."
+	fi
+    done
     echo
-    echo "Fetching latest Arch news .."
-    curl -silent "$NEWSURL" |
-    html2text --ignore-emphasis --ignore-links --ignore-images |
-    grep '^20[0-9][0-9]-' | head -$NUMNEWS >$tmp
+    # Get news from appropriate feed ..
+    case $(uname -m) in
+    i686)
+	echo "Fetching latest Arch 32 news .."
+	NEWSURL="https://news.archlinux32.org/rss.php"
+	curl --silent "$NEWSURL" | unidecode |
+	xml sel -t -m //_:entry -v _:published -o "|" -v _:title -n >$tmp2
+	;;
+    *)
+	echo "Fetching latest Arch news .."
+	NEWSURL="https://www.archlinux.org/feeds/news/"
+	curl --silent "$NEWSURL" | unidecode |
+	xml sel -t -m //item -v pubDate -o "|" -v title -n >$tmp2
+	;;
+    esac
+
+    head -$NUMNEWS $tmp2 | while IFS="|" read d t; do
+	dt=$(date -d"$d" "+%Y-%m-%d")
+	echo "$dt: $(trim $t)"
+    done >$tmp
 
     if [[ -f $LAST ]]; then
 	diffs=$(comm -23 <(sort $tmp) <(sort $LAST) | sort -rn)
@@ -162,16 +221,8 @@ if [[ -z "$NEWS" ]]; then
 	echo "$diffs"
 	echo
 	echo "Read details at $NEWSURL"
-	msg="Continue Arch software upgrade?"
-	if [[ $GUI -ne 0 ]]; then
-	    if ! popup question "$msg"; then
-		exit 0
-	    fi
-	else
-	    echo
-	    if ! ask "$msg" N; then
-		exit 0
-	    fi
+	if ! message question "Continue Arch software upgrade?" N; then
+	    exit 0
 	fi
 
 	# Update stamp file now the user has chosen to proceed
@@ -184,40 +235,32 @@ if [[ -z "$NEWS" ]]; then
 fi
 
 echo
-echo "Performing Arch software update and upgrade .."
+echo "Performing Arch software upgrade, using $conf."
 
-if [[ -n "$DEVEL" ]]; then
-    DEVEL="--devel"
-fi
+[ -n "$DEVEL" ] && DEVEL="--devel"
 
 # Can redefine/override following environment variable (e.g. add to the
 # $CONF config file, or in ~/.profile) to use different package manager.
 echo
-echo ${ARCH_UPGRADE}
+echo $ARCH_UPGRADE $DEVEL
 
 if ! $ARCH_UPGRADE $DEVEL; then
-    msg="Arch software upgrade finished with ERROR."
-    echo
-    echo "##### $msg #####"
-    if [[ $GUI -ne 0 ]]; then
-	popup error "$msg"
-    fi
-    exit 1
+    message error "Arch software upgrade finished with ERROR."
 fi
 
 if [ -z "$MIRROR" -a -f $MIRLIST -a -f $NEWLIST ]; then
     sed '/^ *#/d' $MIRLIST | while read line; do
-    if ! grep -q " *#* *$line *$" $NEWLIST; then
-	echo
-	echo "Warning: $NEWLIST has been updated."
-    fi
+	if ! grep -q " *#* *$line *$" $NEWLIST; then
+	    message info "Arch software upgrade completed.\n\nNote that $NEWLIST has been updated."
+	    exit 1
+	fi
     done
+
+    # Test whether above pipe-line terminated early
+    if [ $? != 0 ]; then
+	exit 0
+    fi
 fi
 
-msg="Arch software upgrade finished."
-echo
-echo "##### $msg #####"
-if [[ $GUI -ne 0 ]]; then
-    popup info "$msg"
-fi
+message info "Arch software upgrade completed."
 exit 0
