@@ -12,7 +12,6 @@ ARCH_UPGRADE="pacaur -Syu --noconfirm --noedit"
 
 # Number of lines of recent arch news we want to see
 NUMNEWS=10
-NEWSURL="https://www.archlinux.org/news/"
 
 MIRLIST=/etc/pacman.d/mirrorlist
 NEWLIST=$MIRLIST.pacnew
@@ -59,6 +58,13 @@ shift $((OPTIND - 1))
 if [[ $# -ne 0 ]]; then
     usage
 fi
+
+# Trim lead/trail spaces from given string argument
+trim() {
+    local args="${*%% }"
+    args="${args## }"
+    echo "$args"
+}
 
 # Function to read yes/no response
 ask() {
@@ -168,7 +174,8 @@ if ! type $HELPER &>/dev/null; then
 fi
 
 tmp=$(mktemp)
-trap "rm -f $tmp /tmp/$PROG; exit" 0 1 2 3 15
+tmp2=$(mktemp)
+trap "rm -f $tmp $tmp2 /tmp/$PROG; exit" 0 1 2 3 15
 
 echo "##### Arch software upgrade starting #####"
 
@@ -178,16 +185,32 @@ fi
 
 # Grab latest news and report any new news items
 if [[ -z "$NEWS" ]]; then
-    for prog in curl html2text unidecode; do
+    for prog in curl unidecode xmlstarlet; do
 	if ! type $prog &>/dev/null; then
 	    message error "Please install $prog utility."
 	fi
     done
     echo
-    echo "Fetching latest Arch news .."
-    curl --silent "$NEWSURL" | unidecode -e "utf-8" |
-    html2text --ignore-emphasis --ignore-links --ignore-images |
-    grep '^20[0-9][0-9]-' | head -$NUMNEWS >$tmp
+    # Get news from appropriate feed ..
+    case $(uname -m) in
+    i686)
+	echo "Fetching latest Arch 32 news .."
+	NEWSURL="https://news.archlinux32.org/rss.php"
+	curl --silent "$NEWSURL" | unidecode |
+	xml sel -t -m //_:entry -v _:published -o "|" -v _:title -n >$tmp2
+	;;
+    *)
+	echo "Fetching latest Arch news .."
+	NEWSURL="https://www.archlinux.org/feeds/news/"
+	curl --silent "$NEWSURL" | unidecode |
+	xml sel -t -m //item -v pubDate -o "|" -v title -n >$tmp2
+	;;
+    esac
+
+    head -$NUMNEWS $tmp2 | while IFS="|" read d t; do
+	dt=$(date -d"$d" "+%Y-%m-%d")
+	echo "$dt: $(trim $t)"
+    done >$tmp
 
     if [[ -f $LAST ]]; then
 	diffs=$(comm -23 <(sort $tmp) <(sort $LAST) | sort -rn)
