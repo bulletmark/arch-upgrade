@@ -53,7 +53,7 @@ while getopts gdnmc: c; do
     esac
 done
 
-shift $((OPTIND - 1))
+shift "$((OPTIND - 1))"
 
 if [[ $# -ne 0 ]]; then
     usage
