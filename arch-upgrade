@@ -55,9 +55,7 @@ done
 
 shift "$((OPTIND - 1))"
 
-if [[ $# -ne 0 ]]; then
-    usage
-fi
+[ $# -ne 0 ] && usage
 
 # Trim lead/trail spaces from given string argument
 trim() {
@@ -179,9 +177,7 @@ trap "rm -f $tmp $tmp2 /tmp/$PROG; exit" 0 1 2 3 15
 
 echo "##### Arch software upgrade starting #####"
 
-if [[ $GUI -eq 0 ]]; then
-    unset DISPLAY
-fi
+[ $GUI -eq 0 ] && unset DISPLAY
 
 # Grab latest news and report any new news items
 if [[ -z "$NEWS" ]]; then
@@ -241,9 +237,7 @@ fi
 echo
 echo "Performing Arch software upgrade, using $conf."
 
-if [[ -n "$DEVEL" ]]; then
-    DEVEL="--devel"
-fi
+[ -n "$DEVEL" ] && DEVEL="--devel"
 
 # Can redefine/override following environment variable (e.g. add to the
 # $CONF config file, or in ~/.profile) to use different package manager.
