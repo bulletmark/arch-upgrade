@@ -1,16 +1,19 @@
 ### ARCH LINUX UPGRADER
 
-[Arch-upgrade](http://github.com/bulletmark/arch-upgrade) is small
+[Arch-upgrade](https://github.com/bulletmark/arch-upgrade) is small
 desktop convenience app which can be placed in your
-[Arch Linux](http://www.archlinux.org) launcher/dock. Click on it to pop
+[Arch Linux](https://www.archlinux.org) launcher/dock. Click on it to pop
 up a terminal window to upgrade your system and AUR packages. Click on
 the OK button when complete. Before updating, it will present a prompt
-for new Arch news notices that have been posted since you last
-updated. You can also run `arch-upgrade` directly on the command line, with or
-without GUI prompts.
+for new [Arch Linux News](https://news.archlinux32.org/) notices that have
+been posted since you last updated. You can also run `arch-upgrade`
+directly on the command line, with or without GUI prompts.
+
+If run on a [Arch Linux 32](https://archlinux32.org) system then
+news will be fetched from [Arch Linux 32 News](https://news.archlinux32.org/).
 
 The latest version and documentation is available at
-http://github.com/bulletmark/arch-upgrade.
+https://github.com/bulletmark/arch-upgrade.
 
 ### INSTALLATION
 
@@ -20,20 +23,20 @@ NOTE: Arch users can just install
     # Install curl, python-html2text, python-unidecode, git
     # Install zenity, wmctrl if you are going to use the GUI, i.e. not
     # just on the command line. E.g. you don't need these on a server.
-    git clone http://github.com/bulletmark/arch-upgrade
+    git clone https://github.com/bulletmark/arch-upgrade
     cd arch-upgrade
     sudo make install
 
 ### CHOOSE PACKAGE MANAGER AND CONFIGURATION
 
-Then install [Pacaur](http://aur.archlinux.org/packages/pacaur/) from
+Then install [Pacaur](https://aur.archlinux.org/packages/pacaur/) from
 the AUR.
-[Pacaur](http://aur.archlinux.org/packages/pacaur/) is the default
+[Pacaur](https://aur.archlinux.org/packages/pacaur/) is the default
 package manager used by _arch-upgrade_ but you can choose another by
 copying the system-wide default `/etc/arch-upgrade.conf` file to your
 personal `$HOME/.config/arch-upgrade.conf` and editing it to specify an
 alternative package manager like
-[Yaourt](http://aur.archlinux.org/packages/yaourt/). You can also
+[Yaourt](https://aur.archlinux.org/packages/yaourt/). You can also
 specify different options to the package manager.
 
 NOTE: _Arch-upgrade_ now installs system-wide but old versions installed
@@ -72,6 +75,6 @@ version.
 This program is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
-Public License at <http://www.gnu.org/licenses/> for more details.
+Public License at <https://www.gnu.org/licenses/> for more details.
 
 <!-- vim: se ai syn=markdown: -->
