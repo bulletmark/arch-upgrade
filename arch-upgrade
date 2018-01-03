@@ -5,7 +5,7 @@
 ### Start conf ..
 # These variables can be overridden in your personal configuration file.
 
-# Package manager we want to use.
+# Default package manager command (if not explicitly configured)
 ARCH_UPGRADE="pacaur -Syu --noconfirm --noedit"
 
 ### End conf
@@ -72,10 +72,10 @@ ask() {
     # Arg 2 is optional "Y" or "N" default
     echo
     while true; do
-        if [[ "$2" = "Y" ]]; then
+        if [[ $2 == Y ]]; then
             prompt="Y/n"
             default="Y"
-        elif [[ "$2" = "N" ]]; then
+        elif [[ $2 == N ]]; then
             prompt="y/N"
             default="N"
         else
@@ -87,7 +87,7 @@ ask() {
         read -p "$1 [$prompt] " REPLY
 
         # Default?
-        if [[ -z "$REPLY" ]]; then
+        if [[ -z $REPLY ]]; then
             REPLY=$default
         fi
 
@@ -106,11 +106,11 @@ message() {
     local def="$3"
 
     res=0
-    if [ $GUI -eq 0 ]; then
-	if [ "$mtype" = question ]; then
+    if [[ $GUI -eq 0 ]]; then
+	if [[ $mtype == question ]]; then
 	    ask "$msg" "$def"
 	    res=$?
-	elif [ "$mtype" = error ]; then
+	elif [[ $mtype == error ]]; then
 	    echo
 	    echo -e "ERROR: $msg"
 	    exit 1
@@ -127,7 +127,7 @@ message() {
 	    fi
 	done
 
-	if [ "$mtype" = error ]; then
+	if [[ $mtype == error ]]; then
 	    msg="ERROR: $msg"
 	fi
 
@@ -135,7 +135,7 @@ message() {
 	zenity --class $WMCLASS --icon-name $WMICON --$mtype \
 	    --title "" --text "$msg" --ellipsize
 	res=$?
-	if [ "$mtype" = error ]; then
+	if [[ $mtype == error ]]; then
 	    exit 1
 	fi
     fi
@@ -143,21 +143,21 @@ message() {
     return $res
 }
 
-if [ -n "$FCONF" ]; then
-    if [ ! -r "$FCONF" ]; then
+if [[ -n $FCONF ]]; then
+    if [[ ! -r $FCONF ]]; then
 	message error "Can not read configuration file \"$FCONF\"."
     fi
     conf="$FCONF"
 else
     for conf in $CONF; do
-	if [ -f $conf ]; then
+	if [[ -f $conf ]]; then
 	    source $conf
 	    break
 	fi
 	conf=""
     done
 
-    if [ -z "$conf" ]; then
+    if [[ -z $conf ]]; then
 	message error "No configuration file found at any of:\n\n$CONF"
     fi
 fi
@@ -184,7 +184,7 @@ if [[ $GUI -eq 0 ]]; then
 fi
 
 # Grab latest news and report any new news items
-if [[ -z "$NEWS" ]]; then
+if [[ -z $NEWS ]]; then
     for prog in curl unidecode xmlstarlet; do
 	if ! type $prog &>/dev/null; then
 	    message error "Please install $prog utility."
@@ -241,7 +241,7 @@ fi
 echo
 echo "Performing Arch software upgrade, using $conf."
 
-if [[ -n "$DEVEL" ]]; then
+if [[ -n $DEVEL ]]; then
     DEVEL="--devel"
 fi
 
@@ -254,7 +254,7 @@ if ! $ARCH_UPGRADE $DEVEL; then
     message error "Arch software upgrade finished with ERROR."
 fi
 
-if [ -z "$MIRROR" -a -f $MIRLIST -a -f $NEWLIST ]; then
+if [[ -z $MIRROR && -f $MIRLIST && -f $NEWLIST ]]; then
     sed '/^ *#/d' $MIRLIST | while read line; do
 	if ! grep -q " *#* *$line *$" $NEWLIST; then
 	    message info "Arch software upgrade completed.\n\nNote that $NEWLIST has been updated."
@@ -263,7 +263,7 @@ if [ -z "$MIRROR" -a -f $MIRLIST -a -f $NEWLIST ]; then
     done
 
     # Test whether above pipe-line terminated early
-    if [ $? != 0 ]; then
+    if [[ $? != 0 ]]; then
 	exit 0
     fi
 fi
