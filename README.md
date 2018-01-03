@@ -20,13 +20,18 @@ https://github.com/bulletmark/arch-upgrade.
 NOTE: Arch users can/should just install
 [_arch-upgrade from the AUR_](https://aur.archlinux.org/packages/arch-upgrade/) and skip to the next section.
 
-    # Install curl, python-unidecode, xmlstarlet, and git packages.
-    # If you are going to use the GUI, install zenity and wmctrl
-    # packages. You don't need these if you are just going to run
-    # arch-upgrade on the command line, e.g. as on a server.
+1. Install `curl`, `python-unidecode`, `xmlstarlet`, and `git` packages.
+
+2. If you are going to use the GUI, also install `zenity` and `wmctrl`
+packages. You don't need these if you are just going to run
+arch-upgrade on the command line, e.g. on a server.
+
+3. Run the following commands:
+~~~~
     git clone https://github.com/bulletmark/arch-upgrade
     cd arch-upgrade
     sudo make install
+~~~~
 
 ### CHOOSE PACKAGE MANAGER AND CONFIGURATION
 
