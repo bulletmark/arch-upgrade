@@ -30,7 +30,7 @@ arch-upgrade on the command line, e.g. on a server.
 ~~~~
     git clone https://github.com/bulletmark/arch-upgrade
     cd arch-upgrade
-    sudo make install
+    sudo make install (or sudo ./arch-upgrade-setup install)
 ~~~~
 
 ### CHOOSE PACKAGE MANAGER AND CONFIGURATION
@@ -57,7 +57,7 @@ You can type this any time so no harm is done running it to make sure.
 
     cd arch-upgrade  # Source dir, as above
     git pull
-    sudo make install
+    sudo make install (or sudo ./arch-upgrade-setup install)
 
 ### REMOVAL
 
