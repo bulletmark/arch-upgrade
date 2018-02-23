@@ -195,14 +195,16 @@ if [[ -z $NEWS ]]; then
     case $(uname -m) in
     i686)
 	echo "Fetching latest Arch 32 news .."
-	NEWSURL="https://news.archlinux32.org/rss.php"
-	curl --silent "$NEWSURL" | unidecode |
+	NEWSSITE="https://news.archlinux32.org/"
+	NEWSFEED="https://news.archlinux32.org/rss.php"
+	curl --silent "$NEWSFEED" | unidecode |
 	xml sel -t -m //_:entry -v _:published -o "|" -v _:title -n >$tmp2
 	;;
     *)
 	echo "Fetching latest Arch news .."
-	NEWSURL="https://www.archlinux.org/feeds/news/"
-	curl --silent "$NEWSURL" | unidecode |
+	NEWSSITE="https://www.archlinux.org/news/"
+	NEWSFEED="https://www.archlinux.org/feeds/news/"
+	curl --silent "$NEWSFEED" | unidecode |
 	xml sel -t -m //item -v pubDate -o "|" -v title -n >$tmp2
 	;;
     esac
@@ -224,7 +226,7 @@ if [[ -z $NEWS ]]; then
 	echo "*** WARNING - ARCH NEWS UPDATE ***:"
 	echo "$diffs"
 	echo
-	echo "Read details at $NEWSURL"
+	echo "Read details at $NEWSSITE"
 	if ! message question "Continue Arch software upgrade?" N; then
 	    exit 0
 	fi
