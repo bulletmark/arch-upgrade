@@ -232,7 +232,7 @@ if [[ -z $NEWS ]]; then
 	fi
 
 	# Update stamp file now the user has chosen to proceed
-	mkdir -p $(dirname $LAST)
+	mkdir -p "$(dirname $LAST)"
 	mv $tmp $LAST
     else
 	echo
