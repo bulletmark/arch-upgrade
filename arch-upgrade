@@ -3,10 +3,11 @@
 # M.Blakeney.
 
 ### Start conf ..
-# These variables can be overridden in your personal configuration file.
+# These variables can be overridden in your personal configuration file
+# or you can set via environment variable.
 
 # Default package manager command (if not explicitly configured)
-ARCH_UPGRADE="pacaur -Syu --noconfirm --noedit"
+ARCH_UPGRADE="${ARCH_UPGRADE:-pacaur -Syu --noconfirm --noedit}"
 
 ### End conf
 
