@@ -133,7 +133,7 @@ message() {
 
 	(sleep 1 && wmctrl -xa $WMCLASS -I $WMICON -b add,above)&
 	zenity --class $WMCLASS --icon-name $WMICON --$mtype \
-	    --title "" --text "$msg" --ellipsize
+	    --title "" --text "$msg" --ellipsize 2>/dev/null
 	res=$?
 	if [[ $mtype == error ]]; then
 	    exit 1
