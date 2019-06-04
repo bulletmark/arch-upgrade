@@ -210,6 +210,12 @@ if [[ -z $NEWS ]]; then
 	;;
     esac
 
+    if [ $? -ne 0 ]; then
+	if ! message question "News fetch failed. Continue?" N; then
+	    exit 0
+	fi
+    fi
+
     head -$NUMNEWS $tmp2 | while IFS="|" read d t; do
 	dt=$(date -d"$d" "+%Y-%m-%d")
 	echo "$dt: $(trim $t)"
