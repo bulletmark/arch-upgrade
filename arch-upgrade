@@ -7,7 +7,7 @@
 # or you can set via environment variable.
 
 # Default package manager command (if not explicitly configured)
-ARCH_UPGRADE="${ARCH_UPGRADE:-pacaur -Syu --noconfirm --noedit}"
+ARCH_UPGRADE="${ARCH_UPGRADE:-yay -Syu --noconfirm --combinedupgrade}"
 
 ### End conf
 
