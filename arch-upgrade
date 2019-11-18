@@ -168,15 +168,15 @@ if ! flock -n 200; then
     message error "$PROG is already running!"
 fi
 
+trap 'rm -f $tmp1 $tmp2 /tmp/$PROG' EXIT
+tmp1=$(mktemp)
+tmp2=$(mktemp)
+
 read HELPER junk <<<$ARCH_UPGRADE
 if ! type $HELPER &>/dev/null; then
     message error "AUR helper \"$HELPER\" is not installed."
     exit 1
 fi
-
-tmp=$(mktemp)
-tmp2=$(mktemp)
-trap "rm -f $tmp $tmp2 /tmp/$PROG; exit" 0 1 2 3 15
 
 echo "##### Arch software upgrade starting #####"
 
@@ -210,40 +210,43 @@ if [[ -z $NEWS ]]; then
 	;;
     esac
 
-    if [ $? -ne 0 ]; then
+    if [[ $? -ne 0 ]]; then
 	if ! message question "News fetch failed. Continue?" N; then
 	    exit 0
 	fi
+	rm -f $tmp2
     fi
 
-    head -$NUMNEWS $tmp2 | while IFS="|" read d t; do
-	dt=$(date -d"$d" "+%Y-%m-%d")
-	echo "$dt: $(trim $t)"
-    done >$tmp
+    if [[ -s $tmp2 ]]; then
+	head -$NUMNEWS $tmp2 | while IFS="|" read d t; do
+	    dt=$(date -d"$d" "+%Y-%m-%d")
+	    echo "$dt: $(trim $t)"
+	done >$tmp1
 
-    if [[ -f $LAST ]]; then
-	diffs=$(comm -23 <(sort $tmp) <(sort $LAST) | sort -rn)
-    else
-	diffs=$(cat $tmp)
-    fi
-
-    if [[ -n $diffs ]]; then
-	# If new news then stop and prompt
-	echo
-	echo "*** WARNING - ARCH NEWS UPDATE ***:"
-	echo "$diffs"
-	echo
-	echo "Read details at $NEWSSITE"
-	if ! message question "Continue Arch software upgrade?" N; then
-	    exit 0
+	if [[ -f $LAST ]]; then
+	    diffs=$(comm -23 <(sort $tmp1) <(sort $LAST) | sort -rn)
+	else
+	    diffs=$(cat $tmp1)
 	fi
 
-	# Update stamp file now the user has chosen to proceed
-	mkdir -p "$(dirname $LAST)"
-	mv $tmp $LAST
-    else
-	echo
-	echo "No Arch news updates."
+	if [[ -n $diffs ]]; then
+	    # If new news then stop and prompt
+	    echo
+	    echo "*** WARNING - ARCH NEWS UPDATE ***:"
+	    echo "$diffs"
+	    echo
+	    echo "Read details at $NEWSSITE"
+	    if ! message question "Continue Arch software upgrade?" N; then
+		exit 0
+	    fi
+
+	    # Update stamp file now the user has chosen to proceed
+	    mkdir -p "$(dirname $LAST)"
+	    mv $tmp1 $LAST
+	else
+	    echo
+	    echo "No Arch news updates."
+	fi
     fi
 fi
 

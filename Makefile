@@ -25,6 +25,9 @@ install:
 uninstall:
 	@./arch-upgrade-setup -d "$(DESTDIR)" uninstall
 
+check:
+	shellcheck arch-upgrade arch-upgrade-setup
+
 doc:	$(DOCOUT)
 
 $(DOCOUT): $(DOC)
