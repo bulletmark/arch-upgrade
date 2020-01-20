@@ -30,6 +30,7 @@ usage() {
     echo "-g (run with GUI prompts)"
     echo "-d (include development packages in upgrade)"
     echo "-n (skip fetch and check/report of latest news)"
+    echo "-a (automatically accept latest news)"
     echo "-m (skip check/report of mirrorlist file update)"
     echo "-c <conffile> (alternative configuration file)"
     echo
@@ -41,13 +42,15 @@ usage() {
 GUI=0
 DEVEL=""
 NEWS=""
+AUTONEWS=0
 MIRROR=""
 FCONF=""
-while getopts gdnmc: c; do
+while getopts gdnamc: c; do
     case $c in
     g) GUI=1;;
     d) DEVEL="-d";;
     n) NEWS="-n";;
+    a) AUTONEWS=1;;
     m) MIRROR="-m";;
     c) FCONF="$OPTARG";;
     ?) usage;;
@@ -238,8 +241,10 @@ if [[ -z $NEWS ]]; then
 	    echo "$diffs"
 	    echo
 	    echo "Read details at $NEWSSITE"
-	    if ! message question "Continue Arch software upgrade?" N; then
-		exit 0
+	    if [[ $AUTONEWS -eq 0 ]]; then
+		if ! message question "Continue Arch software upgrade?" N; then
+		    exit 0
+		fi
 	    fi
 
 	    # Update stamp file now the user has chosen to proceed

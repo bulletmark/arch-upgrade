@@ -9,9 +9,6 @@ for new [Arch Linux News](https://news.archlinux32.org/) notices that have
 been posted since you last updated. You can also run `arch-upgrade`
 directly on the command line, with or without GUI prompts.
 
-If run on a [Arch Linux 32](https://archlinux32.org) system then
-news will be fetched from [Arch Linux 32 News](https://news.archlinux32.org/).
-
 The latest version and documentation is available at
 https://github.com/bulletmark/arch-upgrade.
 
@@ -70,6 +67,22 @@ You can also run directly on the command line. In this case it will not
 use GUI popups and will only prompt from the command line. Just type:
 
     arch-upgrade
+
+Command line options are:
+
+```
+Usage: arch-upgrade
+Options:
+-g (run with GUI prompts)
+-d (include development packages in upgrade)
+-n (skip fetch and check/report of latest news)
+-a (automatically accept latest news)
+-m (skip check/report of mirrorlist file update)
+-c <conffile> (alternative configuration file)
+
+The configuration file used is the first found of:
+/home/mark/.config/arch-upgrade.conf /etc/arch-upgrade.conf
+```
 
 ### LICENSE
 
