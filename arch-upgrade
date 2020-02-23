@@ -197,15 +197,13 @@ if [[ -z $NEWS ]]; then
     echo
     # Get news from appropriate feed ..
     case $(uname -m) in
-    # Disable specific Arch 32 news until infrastructure is recovered,
-    # if ever.
-    # i686)
-	# echo "Fetching latest Arch 32 news .."
-	# NEWSSITE="https://news.archlinux32.org/"
-	# NEWSFEED="https://news.archlinux32.org/rss.php"
-	# curl --silent "$NEWSFEED" | unidecode |
-	# xml sel -t -m //_:entry -v _:published -o "|" -v _:title -n >$tmp2
-	# ;;
+    i686)
+	echo "Fetching latest Arch 32 news .."
+	NEWSSITE="https://bbs.archlinux32.org/viewforum.php?id=12"
+	NEWSFEED="https://bbs.archlinux32.org/extern.php?action=feed&fid=12&type=atom"
+	curl --silent "$NEWSFEED" | unidecode |
+	xml sel -t -m //_:entry -v _:updated -o "|" -v _:title -n >$tmp2
+	;;
     *)
 	echo "Fetching latest Arch news .."
 	NEWSSITE="https://www.archlinux.org/news/"
