@@ -32,15 +32,13 @@ arch-upgrade on the command line, e.g. on a server.
 
 ### CHOOSE PACKAGE MANAGER AND CONFIGURATION
 
-[pacaur](https://aur.archlinux.org/packages/pacaur/) is the default
+[yay](https://aur.archlinux.org/packages/yay/) is the default
 package manager used by _arch-upgrade_ but you can choose another by
 copying the system-wide default `/etc/arch-upgrade.conf` file to your
 personal `$HOME/.config/arch-upgrade.conf` and editing it to specify an
 alternative package manager like
 [pacman](https://www.archlinux.org/pacman/),
-[yay](https://aur.archlinux.org/packages/yay/),
-[trizen](https://aur.archlinux.org/packages/trizen/),
-[yaourt](https://aur.archlinux.org/packages/yaourt/), or any other.
+[trizen](https://aur.archlinux.org/packages/trizen/), or any other.
 You can also specify different options to the package manager.
 
 NOTE: _Arch-upgrade_ now installs system-wide but old versions installed
