@@ -196,24 +196,35 @@ if [[ -z $NEWS ]]; then
     done
     echo
     # Get news from appropriate feed ..
+    res=1
     case $(uname -m) in
     i686)
 	echo "Fetching latest Arch 32 news .."
 	NEWSSITE="https://bbs.archlinux32.org/viewforum.php?id=12"
 	NEWSFEED="https://bbs.archlinux32.org/extern.php?action=feed&fid=12&type=atom"
-	curl --silent "$NEWSFEED" | unidecode |
-	xml sel -t -m //_:entry -v _:updated -o "|" -v _:title -n >$tmp2
+	curl --silent "$NEWSFEED" >$tmp1
+	res=$?
+	if [[ $res -eq 0 ]]; then
+	    unidecode $tmp1 |
+	    xml sel -t -m //_:entry -v _:updated -o "|" -v _:title -n >$tmp2
+	    res=$?
+	fi
 	;;
     *)
 	echo "Fetching latest Arch news .."
 	NEWSSITE="https://www.archlinux.org/news/"
 	NEWSFEED="https://www.archlinux.org/feeds/news/"
-	curl --silent "$NEWSFEED" | unidecode |
-	xml sel -t -m //item -v pubDate -o "|" -v title -n >$tmp2
+	curl --silent "$NEWSFEED" >$tmp1
+	res=$?
+	if [[ $res -eq 0 ]]; then
+	    unidecode $tmp1 |
+	    xml sel -t -m //item -v pubDate -o "|" -v title -n >$tmp2
+	    res=$?
+	fi
 	;;
     esac
 
-    if [[ $? -ne 0 ]]; then
+    if [[ $res -ne 0 ]]; then
 	if ! message question "News fetch failed. Continue?" N; then
 	    exit 0
 	fi
