@@ -212,8 +212,8 @@ if [[ -z $NEWS ]]; then
 	;;
     *)
 	echo "Fetching latest Arch news .."
-	NEWSSITE="https://www.archlinux.org/news/"
-	NEWSFEED="https://www.archlinux.org/feeds/news/"
+	NEWSSITE="https://archlinux.org/news/"
+	NEWSFEED="https://archlinux.org/feeds/news/"
 	curl --silent "$NEWSFEED" >$tmp1
 	res=$?
 	if [[ $res -eq 0 ]]; then
