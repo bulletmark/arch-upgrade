@@ -1,4 +1,5 @@
 ### ARCH LINUX UPGRADER
+[![AUR](https://img.shields.io/aur/version/arch-upgrade)](https://aur.archlinux.org/packages/arch-upgrade/)
 
 [Arch-upgrade](https://github.com/bulletmark/arch-upgrade) is small
 desktop convenience app which can be placed in your
