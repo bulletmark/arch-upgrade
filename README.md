@@ -81,7 +81,7 @@ Options:
 -c <conffile> (alternative configuration file)
 
 The configuration file used is the first found of:
-/home/mark/.config/arch-upgrade.conf /etc/arch-upgrade.conf
+~/.config/arch-upgrade.conf /etc/arch-upgrade.conf
 ```
 
 ### LICENSE
