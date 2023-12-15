@@ -21,7 +21,6 @@ PROG="$(basename $0)"
 LAST="${XDG_CACHE_HOME:-$HOME/.cache}/$PROG.cache"
 CONF="${XDG_CONFIG_HOME:-$HOME/.config}/$PROG.conf /etc/$PROG.conf"
 
-WMCLASS="ArchUpgrade"
 WMICON="arch-upgrade"
 
 usage() {
@@ -124,7 +123,7 @@ message() {
 	fi
     else
 	# Using GUI so check for required packages.
-	for prog in zenity wmctrl; do
+	for prog in zenity; do
 	    if ! type $prog &>/dev/null; then
 		ask "ERROR: Please install $prog." Y
 		exit 1
@@ -135,8 +134,7 @@ message() {
 	    msg="ERROR: $msg"
 	fi
 
-	(sleep 1 && wmctrl -xa $WMCLASS -I $WMICON -b add,above)&
-	zenity --class $WMCLASS --icon-name $WMICON --$mtype \
+	zenity --icon-name $WMICON --$mtype --modal \
 	    --title "" --text "$msg" --ellipsize 2>/dev/null
 	res=$?
 	if [[ $mtype == error ]]; then

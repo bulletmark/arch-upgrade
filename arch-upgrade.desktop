@@ -6,4 +6,3 @@ Exec=/usr/bin/arch-upgrade -g
 Icon=arch-upgrade
 Comment=Wrapper script to run Arch system upgrade
 Categories=System
-StartupWMClass=ArchUpgrade
