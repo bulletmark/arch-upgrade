@@ -23,6 +23,8 @@ CONF="${XDG_CONFIG_HOME:-$HOME/.config}/$PROG.conf /etc/$PROG.conf"
 
 WMICON="arch-upgrade"
 
+TITLE="Arch software upgrade"
+
 usage() {
     echo "Usage: $PROG"
     echo "Options:"
@@ -40,17 +42,17 @@ usage() {
 # Process command line options
 GUI=0
 DEVEL=""
-NEWS=""
+NEWS=1
 AUTONEWS=0
-MIRROR=""
+MIRROR=0
 FCONF=""
 while getopts gdnamc: c; do
     case $c in
     g) GUI=1;;
-    d) DEVEL="-d";;
-    n) NEWS="-n";;
+    d) DEVEL="--devel";;
+    n) NEWS=0;;
     a) AUTONEWS=1;;
-    m) MIRROR="-m";;
+    m) MIRROR=1;;
     c) FCONF="$OPTARG";;
     ?) usage;;
     esac
@@ -122,13 +124,10 @@ message() {
 	    echo -e "$msg"
 	fi
     else
-	# Using GUI so check for required packages.
-	for prog in zenity; do
-	    if ! type $prog &>/dev/null; then
-		ask "ERROR: Please install $prog." Y
-		exit 1
-	    fi
-	done
+	if ! type zenity &>/dev/null; then
+	    ask "ERROR: Please install zenity." Y
+	    exit 1
+	fi
 
 	if [[ $mtype == error ]]; then
 	    msg="ERROR: $msg"
@@ -179,14 +178,14 @@ if ! type $HELPER &>/dev/null; then
     exit 1
 fi
 
-echo "##### Arch software upgrade starting #####"
+echo "##### $TITLE starting #####"
 
 if [[ $GUI -eq 0 ]]; then
     unset DISPLAY
 fi
 
 # Grab latest news and report any new news items
-if [[ -z $NEWS ]]; then
+if [[ $NEWS -eq 1 ]]; then
     for prog in curl unidecode xmlstarlet; do
 	if ! type $prog &>/dev/null; then
 	    message error "Please install $prog utility."
@@ -249,7 +248,7 @@ if [[ -z $NEWS ]]; then
 	    echo
 	    echo "Read details at $NEWSSITE"
 	    if [[ $AUTONEWS -eq 0 ]]; then
-		if ! message question "Continue Arch software upgrade?" N; then
+		if ! message question "Continue $TITLE?" N; then
 		    exit 0
 		fi
 	    fi
@@ -265,11 +264,7 @@ if [[ -z $NEWS ]]; then
 fi
 
 echo
-echo "Performing Arch software upgrade, using $conf."
-
-if [[ -n $DEVEL ]]; then
-    DEVEL="--devel"
-fi
+echo "Performing $TITLE, using $conf."
 
 # Can redefine/override following environment variable (e.g. add to the
 # $CONF config file, or in ~/.profile) to use different package manager.
@@ -277,13 +272,13 @@ echo
 echo $ARCH_UPGRADE $DEVEL
 
 if ! $ARCH_UPGRADE $DEVEL; then
-    message error "Arch software upgrade finished with ERROR."
+    message error "$TITLE finished with ERROR."
 fi
 
-if [[ -z $MIRROR && -f $MIRLIST && -f $NEWLIST ]]; then
+if [[ $MIRROR -ne 0 && -f $MIRLIST && -f $NEWLIST ]]; then
     sed '/^ *#/d' $MIRLIST | while read line; do
 	if ! grep -q " *#* *$line *$" $NEWLIST; then
-	    message info "Arch software upgrade completed.\n\nNote that $NEWLIST has been updated."
+	    message info "$TITLE completed.\n\nNote that $NEWLIST has been updated."
 	    exit 1
 	fi
     done
@@ -294,5 +289,5 @@ if [[ -z $MIRROR && -f $MIRLIST && -f $NEWLIST ]]; then
     fi
 fi
 
-message info "Arch software upgrade completed."
+message info "$TITLE completed."
 exit 0
