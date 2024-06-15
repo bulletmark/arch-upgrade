@@ -168,9 +168,10 @@ if ! flock -n 200; then
     message error "$PROG is already running!"
 fi
 
-trap 'rm -f $tmp1 $tmp2 /tmp/$PROG' EXIT
+trap 'rm -f $tmp1 $tmp2 $tmp3 /tmp/$PROG' EXIT
 tmp1=$(mktemp)
 tmp2=$(mktemp)
+tmp3=$(mktemp)
 
 read HELPER junk <<<$ARCH_UPGRADE
 if ! type $HELPER &>/dev/null; then
@@ -202,8 +203,11 @@ if [[ $NEWS -eq 1 ]]; then
 	curl --silent "$NEWSFEED" >$tmp1
 	res=$?
 	if [[ $res -eq 0 ]]; then
-	    unidecode $tmp1 |
-	    xml sel -t -m //_:entry -v _:updated -o "|" -v _:title -n >$tmp2
+	    # Use temp file to avoid xmlstarlet stdin bug due to:
+	    # https://gitlab.gnome.org/GNOME/libxslt/-/issues/109
+	    # https://gitlab.archlinux.org/archlinux/packaging/packages/libxslt/-/issues/1
+	    unidecode $tmp1 >$tmp3
+	    xml sel -t -m //_:entry -v _:updated -o "|" -v _:title -n $tmp3 >$tmp2
 	    res=$?
 	fi
 	;;
@@ -214,8 +218,11 @@ if [[ $NEWS -eq 1 ]]; then
 	curl --silent "$NEWSFEED" >$tmp1
 	res=$?
 	if [[ $res -eq 0 ]]; then
-	    unidecode $tmp1 |
-	    xml sel -t -m //item -v pubDate -o "|" -v title -n >$tmp2
+	    # Use temp file to avoid xmlstarlet stdin bug due to:
+	    # https://gitlab.gnome.org/GNOME/libxslt/-/issues/109
+	    # https://gitlab.archlinux.org/archlinux/packaging/packages/libxslt/-/issues/1
+	    unidecode $tmp1 > $tmp3
+	    xml sel -t -m //item -v pubDate -o "|" -v title -n $tmp3 >$tmp2
 	    res=$?
 	fi
 	;;
