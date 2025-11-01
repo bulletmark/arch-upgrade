@@ -187,7 +187,7 @@ fi
 
 # Grab latest news and report any new news items
 if [[ $NEWS -eq 1 ]]; then
-    for prog in curl unidecode xmlstarlet; do
+    for prog in curl unidecode xmlstarlet recode; do
         if ! type $prog &>/dev/null; then
             message error "Please install $prog utility."
         fi
@@ -207,7 +207,7 @@ if [[ $NEWS -eq 1 ]]; then
                 # https://gitlab.gnome.org/GNOME/libxslt/-/issues/109
                 # https://gitlab.archlinux.org/archlinux/packaging/packages/libxslt/-/issues/1
                 unidecode $tmp1 >$tmp3
-                xml sel -t -m //_:entry -v _:updated -o "|" -v _:title -n $tmp3 >$tmp2
+                xml sel -t -m //_:entry -v _:updated -o "|" -v _:title -n $tmp3 | recode html >$tmp2
                 res=$?
             fi
             ;;
@@ -221,8 +221,8 @@ if [[ $NEWS -eq 1 ]]; then
                 # Use temp file to avoid xmlstarlet stdin bug due to:
                 # https://gitlab.gnome.org/GNOME/libxslt/-/issues/109
                 # https://gitlab.archlinux.org/archlinux/packaging/packages/libxslt/-/issues/1
-                unidecode $tmp1 > $tmp3
-                xml sel -t -m //item -v pubDate -o "|" -v title -n $tmp3 >$tmp2
+                unidecode $tmp1 >$tmp3
+                xml sel -t -m //item -v pubDate -o "|" -v title -n $tmp3 | recode html >$tmp2
                 res=$?
             fi
             ;;
