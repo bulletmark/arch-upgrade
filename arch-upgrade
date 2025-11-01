@@ -48,13 +48,13 @@ MIRROR=0
 FCONF=""
 while getopts gdnamc: c; do
     case $c in
-    g) GUI=1;;
-    d) DEVEL="--devel";;
-    n) NEWS=0;;
-    a) AUTONEWS=1;;
-    m) MIRROR=1;;
-    c) FCONF="$OPTARG";;
-    ?) usage;;
+        g) GUI=1;;
+        d) DEVEL="--devel";;
+        n) NEWS=0;;
+        a) AUTONEWS=1;;
+        m) MIRROR=1;;
+        c) FCONF="$OPTARG";;
+        ?) usage;;
     esac
 done
 
@@ -112,33 +112,33 @@ message() {
 
     res=0
     if [[ $GUI -eq 0 ]]; then
-	if [[ $mtype == question ]]; then
-	    ask "$msg" "$def"
-	    res=$?
-	elif [[ $mtype == error ]]; then
-	    echo
-	    echo -e "ERROR: $msg"
-	    exit 1
-	else
-	    echo
-	    echo -e "$msg"
-	fi
+        if [[ $mtype == question ]]; then
+            ask "$msg" "$def"
+            res=$?
+        elif [[ $mtype == error ]]; then
+            echo
+            echo -e "ERROR: $msg"
+            exit 1
+        else
+            echo
+            echo -e "$msg"
+        fi
     else
-	if ! type zenity &>/dev/null; then
-	    ask "ERROR: Please install zenity." Y
-	    exit 1
-	fi
+        if ! type zenity &>/dev/null; then
+            ask "ERROR: Please install zenity." Y
+            exit 1
+        fi
 
-	if [[ $mtype == error ]]; then
-	    msg="ERROR: $msg"
-	fi
+        if [[ $mtype == error ]]; then
+            msg="ERROR: $msg"
+        fi
 
-	zenity --icon-name $WMICON --$mtype --modal \
-	    --title "" --text "$msg" --ellipsize 2>/dev/null
-	res=$?
-	if [[ $mtype == error ]]; then
-	    exit 1
-	fi
+        zenity --icon-name $WMICON --$mtype --modal \
+            --title "" --text "$msg" --ellipsize 2>/dev/null
+        res=$?
+        if [[ $mtype == error ]]; then
+            exit 1
+        fi
     fi
 
     return $res
@@ -146,20 +146,20 @@ message() {
 
 if [[ -n $FCONF ]]; then
     if [[ ! -r $FCONF ]]; then
-	message error "Can not read configuration file \"$FCONF\"."
+        message error "Can not read configuration file \"$FCONF\"."
     fi
     conf="$FCONF"
 else
     for conf in $CONF; do
-	if [[ -f $conf ]]; then
-	    source $conf
-	    break
-	fi
-	conf=""
+        if [[ -f $conf ]]; then
+            source $conf
+            break
+        fi
+        conf=""
     done
 
     if [[ -z $conf ]]; then
-	message error "No configuration file found at any of:\n\n$CONF"
+        message error "No configuration file found at any of:\n\n$CONF"
     fi
 fi
 
@@ -188,85 +188,85 @@ fi
 # Grab latest news and report any new news items
 if [[ $NEWS -eq 1 ]]; then
     for prog in curl unidecode xmlstarlet; do
-	if ! type $prog &>/dev/null; then
-	    message error "Please install $prog utility."
-	fi
+        if ! type $prog &>/dev/null; then
+            message error "Please install $prog utility."
+        fi
     done
     echo
     # Get news from appropriate feed ..
     res=1
     case $(uname -m) in
-    i686)
-	echo "Fetching latest Arch 32 news .."
-	NEWSSITE="https://bbs.archlinux32.org/viewforum.php?id=12"
-	NEWSFEED="https://bbs.archlinux32.org/extern.php?action=feed&fid=12&type=atom"
-	curl --silent "$NEWSFEED" >$tmp1
-	res=$?
-	if [[ $res -eq 0 ]]; then
-	    # Use temp file to avoid xmlstarlet stdin bug due to:
-	    # https://gitlab.gnome.org/GNOME/libxslt/-/issues/109
-	    # https://gitlab.archlinux.org/archlinux/packaging/packages/libxslt/-/issues/1
-	    unidecode $tmp1 >$tmp3
-	    xml sel -t -m //_:entry -v _:updated -o "|" -v _:title -n $tmp3 >$tmp2
-	    res=$?
-	fi
-	;;
-    *)
-	echo "Fetching latest Arch news .."
-	NEWSSITE="https://archlinux.org/news/"
-	NEWSFEED="https://archlinux.org/feeds/news/"
-	curl --silent "$NEWSFEED" >$tmp1
-	res=$?
-	if [[ $res -eq 0 ]]; then
-	    # Use temp file to avoid xmlstarlet stdin bug due to:
-	    # https://gitlab.gnome.org/GNOME/libxslt/-/issues/109
-	    # https://gitlab.archlinux.org/archlinux/packaging/packages/libxslt/-/issues/1
-	    unidecode $tmp1 > $tmp3
-	    xml sel -t -m //item -v pubDate -o "|" -v title -n $tmp3 >$tmp2
-	    res=$?
-	fi
-	;;
+        i686)
+            echo "Fetching latest Arch 32 news .."
+            NEWSSITE="https://bbs.archlinux32.org/viewforum.php?id=12"
+            NEWSFEED="https://bbs.archlinux32.org/extern.php?action=feed&fid=12&type=atom"
+            curl --silent "$NEWSFEED" >$tmp1
+            res=$?
+            if [[ $res -eq 0 ]]; then
+                # Use temp file to avoid xmlstarlet stdin bug due to:
+                # https://gitlab.gnome.org/GNOME/libxslt/-/issues/109
+                # https://gitlab.archlinux.org/archlinux/packaging/packages/libxslt/-/issues/1
+                unidecode $tmp1 >$tmp3
+                xml sel -t -m //_:entry -v _:updated -o "|" -v _:title -n $tmp3 >$tmp2
+                res=$?
+            fi
+            ;;
+        *)
+            echo "Fetching latest Arch news .."
+            NEWSSITE="https://archlinux.org/news/"
+            NEWSFEED="https://archlinux.org/feeds/news/"
+            curl --silent "$NEWSFEED" >$tmp1
+            res=$?
+            if [[ $res -eq 0 ]]; then
+                # Use temp file to avoid xmlstarlet stdin bug due to:
+                # https://gitlab.gnome.org/GNOME/libxslt/-/issues/109
+                # https://gitlab.archlinux.org/archlinux/packaging/packages/libxslt/-/issues/1
+                unidecode $tmp1 > $tmp3
+                xml sel -t -m //item -v pubDate -o "|" -v title -n $tmp3 >$tmp2
+                res=$?
+            fi
+            ;;
     esac
 
     if [[ $res -ne 0 ]]; then
-	if ! message question "News fetch failed. Continue?" N; then
-	    exit 0
-	fi
-	rm -f $tmp2
+        if ! message question "News fetch failed. Continue?" N; then
+            exit 0
+        fi
+        rm -f $tmp2
     fi
 
     if [[ -s $tmp2 ]]; then
-	head -$NUMNEWS $tmp2 | while IFS="|" read d t; do
-	    dt=$(date -d"$d" "+%Y-%m-%d")
-	    echo "$dt: $(trim $t)"
-	done >$tmp1
+        head -$NUMNEWS $tmp2 | while IFS="|" read d t; do
+        dt=$(date -d"$d" "+%Y-%m-%d")
+        echo "$dt: $(trim $t)"
+    done >$tmp1
 
-	if [[ -f $LAST ]]; then
-	    diffs=$(comm -23 <(sort $tmp1) <(sort $LAST) | sort -rn)
-	else
-	    diffs=$(cat $tmp1)
-	fi
+    if [[ -f $LAST ]]; then
+        diffs=$(comm -23 <(sort $tmp1) <(sort $LAST) | sort -rn)
+    else
+        diffs=$(cat $tmp1)
+    fi
 
-	if [[ -n $diffs ]]; then
-	    # If new news then stop and prompt
-	    echo
-	    echo "*** WARNING - ARCH NEWS UPDATE ***:"
-	    echo "$diffs"
-	    echo
-	    echo "Read details at $NEWSSITE"
-	    if [[ $AUTONEWS -eq 0 ]]; then
-		if ! message question "Continue $TITLE?" N; then
-		    exit 0
-		fi
-	    fi
+    if [[ -n $diffs ]]; then
+        # If new news then stop and prompt
+        echo
+        echo "*** WARNING - ARCH NEWS UPDATE ***:"
+        echo "$diffs"
+        echo
+        echo "Read details at $NEWSSITE"
+        if [[ $AUTONEWS -eq 0 ]]; then
+            if ! message question "Continue $TITLE?" N; then
+                exit 0
+            fi
+        fi
 
-	    # Update stamp file now the user has chosen to proceed
-	    mkdir -p "$(dirname $LAST)"
-	    mv $tmp1 $LAST
-	else
-	    echo
-	    echo "No Arch news updates."
-	fi
+      # Update stamp file now the user has chosen to proceed
+      mkdir -p "$(dirname $LAST)"
+      mv $tmp1 $LAST
+  else
+      echo
+      echo "No Arch news updates."
+    fi
     fi
 fi
 
@@ -284,15 +284,15 @@ fi
 
 if [[ $MIRROR -ne 0 && -f $MIRLIST && -f $NEWLIST ]]; then
     sed '/^ *#/d' $MIRLIST | while read line; do
-	if ! grep -q " *#* *$line *$" $NEWLIST; then
-	    message info "$TITLE completed.\n\nNote that $NEWLIST has been updated."
-	    exit 1
-	fi
-    done
+    if ! grep -q " *#* *$line *$" $NEWLIST; then
+        message info "$TITLE completed.\n\nNote that $NEWLIST has been updated."
+        exit 1
+    fi
+done
 
     # Test whether above pipe-line terminated early
     if [[ $? != 0 ]]; then
-	exit 0
+        exit 0
     fi
 fi
 
