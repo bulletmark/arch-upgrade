@@ -43,14 +43,6 @@ specify an alternative package manager like
 [trizen](https://aur.archlinux.org/packages/trizen/), or any other. You
 can also specify different options to the package manager.
 
-NOTE: _Arch-upgrade_ now installs system-wide but old versions installed
-as local user files so to ensure that any old user configuration is
-removed type the following as your normal user (i.e. not sudo/root).
-
-    arch-upgrade-setup clean
-
-You can type this any time so no harm is done running it to make sure.
-
 ### UPGRADE
 
     cd arch-upgrade  # Source dir, as above
